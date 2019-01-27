@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Cos Track</string>
+    <string name="action_settings">Settings</string>
+    <string name="sample_text_1">Sample Cosplay</string>
+    <string name="sample_text_2">Sample Component</string>
+    <string name="sample_content_description_1">Sample Content Description</string>
+    <string name="title_activity_new_cosplay">New Cosplay</string>
+    <string name="inputCosplayNameHint">Cosplay Name</string>
+    <string name="inputCosplaySeriesHint">Series Name</string>
+    <string name="inputCosplayStartDateHint">Start Date</string>
+    <string name="inputCosplayDueDateHint">Due Date (Optional)</string>
+    <string name="inputCosplayBudgetHint">Budget (Optional)</string>
+    <string name="buttonUploadCosplayImage">Upload Cover Photo</string>
+    <string name="title_activity_edit_cosplay">Edit Cosplay</string>
+    <string name="title_activity_new_component">New Component</string>
+    <string name="title_activity_edit_component">Edit Component</string>
+</resources>

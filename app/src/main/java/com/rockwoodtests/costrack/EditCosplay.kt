@@ -1,17 +1,54 @@
 package com.rockwoodtests.costrack
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.Snackbar
+import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
 import kotlinx.android.synthetic.main.activity_edit_cosplay.*
 import kotlinx.android.synthetic.main.ad_view.*
+import kotlinx.android.synthetic.main.content_edit_component.*
 import kotlinx.android.synthetic.main.content_edit_cosplay.*
 
-class EditCosplay : AppCompatActivity() {
+class EditCosplay : AppCompatActivity(), CosplayView.OnFragmentInteractionListener, ReferenceView.OnFragmentInteractionListener, ToolView.OnFragmentInteractionListener, StatView.OnFragmentInteractionListener {
+
+    private val cosplayFragment = CosplayView() as Fragment
+    private val referenceFragment = ReferenceView() as Fragment
+    private val toolFragment = ToolView() as Fragment
+    private val statFragment = StatView() as Fragment
+    private var active = cosplayFragment
+
+    private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
+        when (item.itemId) {
+            R.id.navigation_components -> {
+                fragmentManager.beginTransaction().hide(active).show(cosplayFragment).commit()
+                active = cosplayFragment
+                return@OnNavigationItemSelectedListener true
+            }
+            R.id.navigation_references -> {
+                fragmentManager.beginTransaction().hide(active).show(referenceFragment).commit()
+                active = referenceFragment
+                return@OnNavigationItemSelectedListener true
+            }
+            R.id.navigation_tools -> {
+                fragmentManager.beginTransaction().hide(active).show(toolFragment).commit()
+                active = toolFragment
+                return@OnNavigationItemSelectedListener true
+            }
+            R.id.navigation_stats -> {
+                fragmentManager.beginTransaction().hide(active).show(statFragment).commit()
+                active = statFragment
+                return@OnNavigationItemSelectedListener true
+            }
+        }
+        false
+    }
+    private val fragmentManager = supportFragmentManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,10 +57,12 @@ class EditCosplay : AppCompatActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        if((0..10).random() >= 6)
-            showAd()
+        cosplay_navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
-        loadComponents()
+        fragmentManager.beginTransaction().add(R.id.mainComponentContainer, statFragment, "4").hide(statFragment).commit()
+        fragmentManager.beginTransaction().add(R.id.mainComponentContainer, toolFragment, "3").hide(toolFragment).commit()
+        fragmentManager.beginTransaction().add(R.id.mainComponentContainer, referenceFragment, "2").hide(toolFragment).commit()
+        fragmentManager.beginTransaction().add(R.id.mainComponentContainer, cosplayFragment, "1").commit()
     }
 
     fun showSelectedComponent(v: View) {
@@ -34,21 +73,9 @@ class EditCosplay : AppCompatActivity() {
         startActivity(Intent(this, NewComponent::class.java))
     }
 
-    private fun loadComponents() {
-        for (i in 1..10) {
-            val inflatedLayout = layoutInflater.inflate(R.layout.component_view, null, false)
+    override fun onFragmentInteraction(uri: Uri) {
 
-            componentContainer.addView(inflatedLayout)
-        }
     }
 
-    private fun showAd() {
-        MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713")
 
-        val inflatedLayout = layoutInflater.inflate(R.layout.ad_view, null, false)
-
-        componentContainer.addView(inflatedLayout, 0)
-
-        adView.loadAd(AdRequest.Builder().addTestDevice("4C7E70DE46968B35CAA28E6C24111C19").build())
-    }
 }

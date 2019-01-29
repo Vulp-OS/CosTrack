@@ -14,4 +14,12 @@
     <string name="title_activity_edit_cosplay">Edit Cosplay</string>
     <string name="title_activity_new_component">New Component</string>
     <string name="title_activity_edit_component">Edit Component</string>
+    <string name="title_activity_temp_activity">temp_activity</string>
+    <string name="title_components">Components</string>
+    <string name="title_tools">Tools</string>
+    <string name="title_stats">Stats</string>
+    <string name="title_activity_edit_component_components">EditComponentComponents</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_references">References</string>
+
 </resources>

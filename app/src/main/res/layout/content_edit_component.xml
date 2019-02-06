@@ -11,7 +11,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     >
 
-    <RelativeLayout
+    <android.support.v4.view.ViewPager
         android:id="@+id/mainComponentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -20,7 +20,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
 
-    </RelativeLayout>
+    </android.support.v4.view.ViewPager>
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/component_navigation"

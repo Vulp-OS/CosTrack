@@ -10,8 +10,8 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     >
 
-    <RelativeLayout
-        android:id="@+id/mainComponentContainer"
+    <android.support.v4.view.ViewPager
+        android:id="@+id/mainCosplayContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/cosplay_navigation"
@@ -19,7 +19,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
 
-    </RelativeLayout>
+    </android.support.v4.view.ViewPager>
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/cosplay_navigation"

@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.View
 import kotlinx.android.synthetic.main.activity_edit_cosplay.*
 import kotlinx.android.synthetic.main.content_edit_cosplay.*
@@ -16,6 +17,8 @@ import kotlinx.android.synthetic.main.content_edit_cosplay.*
 private const val NUM_PAGES = 4
 
 class EditCosplay : AppCompatActivity(), CosplayView.OnFragmentInteractionListener, ReferenceView.OnFragmentInteractionListener, ToolView.OnFragmentInteractionListener, StatView.OnFragmentInteractionListener {
+
+    private var cosplayID: String? = null
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -48,16 +51,18 @@ class EditCosplay : AppCompatActivity(), CosplayView.OnFragmentInteractionListen
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        cosplayID = intent.extras?.getString("cosplayID")   // TODO: Change to ID and use flag to signify if it is for a cosplay or a component
+        val data = Bundle()
+        data.putString("cosplayID", intent.extras?.getString("cosplayID"))
+
         pagerManager = mainCosplayContainer
-        val pagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager)
+        val pagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager, data)
         val pageChangeListener = ScreenSlidePageChangeListener(cosplay_navigation)
         pagerManager.adapter = pagerAdapter
         pagerManager.offscreenPageLimit = 3
         pagerManager.addOnPageChangeListener(pageChangeListener)
 
         cosplay_navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
-
-
     }
 
     override fun onFragmentInteraction(uri: Uri) {
@@ -65,32 +70,47 @@ class EditCosplay : AppCompatActivity(), CosplayView.OnFragmentInteractionListen
     }
 
     fun showSelectedComponent(v: View) {
-        startActivity(Intent(this, EditComponent::class.java))
+        val intent = Intent(this, EditComponent::class.java)
+        intent.putExtra("cosplayID", cosplayID)
+        startActivity(intent)
     }
 
     fun createNewComponent(v: View) {
         startActivity(Intent(this, NewComponent::class.java))
     }
 
-    private inner class ScreenSlidePagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
+    private inner class ScreenSlidePagerAdapter(fm: FragmentManager, private val data: Bundle) : FragmentStatePagerAdapter(fm) {
         override fun getCount(): Int = NUM_PAGES
 
         override fun getItem(position: Int): Fragment {
             when (position) {
                 0  -> {
-                    return CosplayView()
+                    val cv = CosplayView()
+                    cv.arguments = data
+                    return cv
                 }
                 1 -> {
-                    return ReferenceView()
+                    val rv = ReferenceView()
+                    val specialData = data
+                    specialData.putString("type", "cosplay")
+                    rv.arguments = specialData
+                    return rv
                 }
                 2 -> {
-                    return ToolView()
+                    val tv = ToolView()
+                    tv.arguments = data
+                    return tv
                 }
                 3 -> {
-                    return StatView()
+                    val sv = StatView()
+                    sv.arguments = data
+                    return sv
                 }
             }
-            return CosplayView()
+            val cv = CosplayView()
+            cv.arguments = data
+
+            return cv
         }
     }
 
@@ -107,6 +127,5 @@ class EditCosplay : AppCompatActivity(), CosplayView.OnFragmentInteractionListen
             bnv.menu.getItem(p0).isChecked = true
         }
     }
-
 
 }

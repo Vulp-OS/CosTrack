@@ -9,30 +9,29 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
+import android.view.MenuItem
 import android.view.View
 import kotlinx.android.synthetic.main.activity_edit_component.*
 import kotlinx.android.synthetic.main.content_edit_component.*
 
-private const val NUM_PAGES = 4
+private const val NUM_PAGES = 3
 
 class EditComponent: AppCompatActivity(), ComponentView.OnFragmentInteractionListener, ReferenceView.OnFragmentInteractionListener, ToolView.OnFragmentInteractionListener, StatView.OnFragmentInteractionListener{
 
+    private var cosplayID: String? = null
+
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
-            R.id.navigation_components -> {
+            R.id.navigation_references -> {
                 pagerManager.setCurrentItem(0, true)
                 return@OnNavigationItemSelectedListener true
             }
-            R.id.navigation_references -> {
+            R.id.navigation_tools -> {
                 pagerManager.setCurrentItem(1, true)
                 return@OnNavigationItemSelectedListener true
             }
-            R.id.navigation_tools -> {
-                pagerManager.setCurrentItem(2, true)
-                return@OnNavigationItemSelectedListener true
-            }
             R.id.navigation_stats -> {
-                pagerManager.setCurrentItem(3, true)
+                pagerManager.setCurrentItem(2, true)
                 return@OnNavigationItemSelectedListener true
             }
         }
@@ -47,58 +46,66 @@ class EditComponent: AppCompatActivity(), ComponentView.OnFragmentInteractionLis
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        cosplayID = intent.extras?.getString("cosplayID")
+        val data = Bundle()
+        data.putString("cosplayID", cosplayID)  // TODO: Change to ID and use flag to signify if it is for a cosplay or a component
+
         pagerManager = mainComponentContainer
-        val pagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager)
+        val pagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager, data)
         val pageChangeListener = ScreenSlidePageChangeListener(component_navigation)
         pagerManager.adapter = pagerAdapter
-        pagerManager.offscreenPageLimit = 3
+        pagerManager.offscreenPageLimit = 2
         pagerManager.addOnPageChangeListener(pageChangeListener)
 
         component_navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
-    }
-
-    fun showSelectedComponent(v: View) {
-        startActivity(Intent(this, EditComponent::class.java))
-    }
-
-    fun createNewComponent(v: View) {
-        startActivity(Intent(this, NewComponent::class.java))
     }
 
     override fun onFragmentInteraction(uri: Uri) {
 
     }
 
-    override fun onBackPressed() {
-        if (pagerManager.currentItem == 0) {
-            // If the user is currently looking at the first step, allow the system to handle the
-            // Back button. This calls finish() on this activity and pops the back stack.
-            super.onBackPressed()
-        } else {
-            // Otherwise, select the previous step.
-            pagerManager.currentItem = pagerManager.currentItem - 1
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+            }
         }
+
+        return true
     }
 
-    private inner class ScreenSlidePagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
+    override fun onBackPressed() {
+        //super.onBackPressed()
+        val intent = Intent(this, EditCosplay::class.java)
+        intent.putExtra("cosplayID", cosplayID)
+        startActivity(intent)
+        finish()
+    }
+
+    private inner class ScreenSlidePagerAdapter(fm: FragmentManager, private val data: Bundle) : FragmentStatePagerAdapter(fm) {
         override fun getCount(): Int = NUM_PAGES
 
         override fun getItem(position: Int): Fragment {
             when (position) {
                 0  -> {
-                    return ComponentView()
+                    val rv = ReferenceView()
+                    val specialData = data
+                    specialData.putString("type", "component")
+                    rv.arguments = data
+                    return rv
                 }
                 1 -> {
-                    return ReferenceView()
+                    val tv = ToolView()
+                    tv.arguments = data
+                    return tv
                 }
                 2 -> {
-                    return ToolView()
-                }
-                3 -> {
-                    return StatView()
+                    val sv = StatView()
+                    sv.arguments = data
+                    return sv
                 }
             }
-            return ComponentView()
+            return ReferenceView()
         }
     }
 

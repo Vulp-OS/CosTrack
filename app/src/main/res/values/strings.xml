@@ -21,5 +21,11 @@
     <string name="title_activity_edit_component_components">EditComponentComponents</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_references">References</string>
+    <string name="inputComponentNameHint">Component Name</string>
+    <string name="inputComponentAmountSpent">Amount Spent (Optional)</string>
+    <string name="inputComponentComponentType">Component Type</string>
+    <string name="inputComponentFoundItem">Found Item</string>
+    <string name="inputComponentBoughtItem">Bought Item</string>
+    <string name="inputComponentMadeItem">Made Item</string>
 
 </resources>

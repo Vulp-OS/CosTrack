@@ -4,19 +4,22 @@ import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.ad_view.*
+import kotlinx.android.synthetic.main.component_view.view.*
+import kotlinx.android.synthetic.main.content_edit_component.*
 import kotlinx.android.synthetic.main.fragment_cosplay_view.*
 
-
-// TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+private const val ARG_PARAM1 = "cosplayID"
 
 /**
  * A simple [Fragment] subclass.
@@ -28,16 +31,17 @@ private const val ARG_PARAM2 = "param2"
  *
  */
 class CosplayView : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private var user = FirebaseAuth.getInstance().currentUser
+    private var db = FirebaseFirestore.getInstance()
+    private var storage = FirebaseStorage.getInstance()
+
+    private var cosplayID: String? = null
     private var listener: OnFragmentInteractionListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+            cosplayID = it.getString(ARG_PARAM1)
         }
     }
 
@@ -68,7 +72,7 @@ class CosplayView : Fragment() {
         if (context is OnFragmentInteractionListener) {
             listener = context
         } else {
-            throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
+            throw RuntimeException("$context must implement OnFragmentInteractionListener")
         }
     }
 
@@ -78,17 +82,43 @@ class CosplayView : Fragment() {
     }
 
     private fun loadComponents() {
-        for (i in 1..10) {
-            val inflatedLayout = layoutInflater.inflate(R.layout.component_view, null, false)
+        db.collection("cosplays").document(cosplayID as String).get()
+            .addOnSuccessListener { document ->
+                if (document != null) {
+                    val componentKeys = document.data!!["components"] as ArrayList<*>
 
-            cosplayContainer.addView(inflatedLayout)
-        }
+                    for (key in componentKeys) {
+                        db.collection("components").document(key as String).get()
+                            .addOnSuccessListener { componentDocument ->
+                                if (componentDocument != null) {
+                                    val inflatedLayout = layoutInflater.inflate(R.layout.component_view, cosplayContainer, false)
+                                    inflatedLayout.componentCardView.tag = componentDocument.id
+
+                                    inflatedLayout.textView1.text = componentDocument.data!!["name"] as String
+
+                                    val coverImageRef = storage.getReferenceFromUrl(componentDocument.data!!["cover_image"] as String)
+                                    GlideApp.with(this).load(coverImageRef).into(inflatedLayout.imageView1)
+
+                                    cosplayContainer.addView(inflatedLayout)
+
+                                } else {
+                                    Log.d("CosplayView", "Could not find specified component")
+                                }
+                            }
+                    }
+
+                } else {
+                    Log.d("CosplayView", "Could not find specified cosplay")
+                }
+            }
+
+        //db.collection("components").
     }
 
     private fun showAd() {
         MobileAds.initialize(activity, "ca-app-pub-3940256099942544~3347511713")
 
-        val inflatedLayout = layoutInflater.inflate(R.layout.ad_view, null, false)
+        val inflatedLayout = layoutInflater.inflate(R.layout.ad_view, cosplayContainer, false)
 
         cosplayContainer.addView(inflatedLayout, 0)
 
@@ -116,17 +146,14 @@ class CosplayView : Fragment() {
          * Use this factory method to create a new instance of
          * this fragment using the provided parameters.
          *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
+         * @param cosplayID Parameter 1.
          * @return A new instance of fragment CosplayView.
          */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance(cosplayID: String) =
             CosplayView().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+                    putString(ARG_PARAM1, cosplayID)
                 }
             }
     }

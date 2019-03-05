@@ -4,15 +4,21 @@ import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import kotlinx.android.synthetic.main.fragment_reference_view.*
+import kotlinx.android.synthetic.main.reference_view.view.*
 
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+private const val ARG_PARAM1 = "ID"
+private const val ARG_PARAM2 = "type"
 
 /**
  * A simple [Fragment] subclass.
@@ -24,16 +30,18 @@ private const val ARG_PARAM2 = "param2"
  *
  */
 class ReferenceView : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private var db = FirebaseFirestore.getInstance()
+    private var storage = FirebaseStorage.getInstance()
+
+    private var ID: String? = null
+    private var type: Int? = null
     private var listener: OnFragmentInteractionListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+            ID = it.getString(ARG_PARAM1)
+            type = it.getInt(ARG_PARAM2)
         }
     }
 
@@ -43,6 +51,15 @@ class ReferenceView : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_reference_view, container, false)
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        Log.d("ReferenceView", "Provided ID is: $ID")
+        Log.d("ReferenceView", "Provided Type is: $type")
+
+        loadReferences()
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -64,6 +81,49 @@ class ReferenceView : Fragment() {
         listener = null
     }
 
+    private fun loadReferences() {
+        when(type) {
+            0 -> loadReferencesForCosplay()
+            1 -> loadReferencesForComponent()
+            else -> Log.d("ReferenceView", "Unknown type specified")
+        }
+    }
+
+    private fun loadReferencesForCosplay() {
+        db.collection("cosplays").document(ID as String).get()
+            .addOnSuccessListener { document ->
+                if (document != null) {
+                    val imageReferences = ArrayList<StorageReference>()
+                    val referenceURLs = document.data!!["references"] as ArrayList<String>
+
+                    for (url in referenceURLs) {
+                        imageReferences.add(storage.getReferenceFromUrl(url))
+                    }
+
+                    imageContainer.adapter = RecyclerViewAdapter(imageReferences, this.context!!)
+                } else {
+                    Log.d("ReferenceView", "Could not find specified cosplay")
+                }
+            }
+    }
+
+    private fun loadReferencesForComponent() {
+        db.collection("components").document(ID as String).get()
+            .addOnSuccessListener { document ->
+                if (document != null) {
+                    val imageReferences = ArrayList<StorageReference>()
+                    val referenceURLs = document.data!!["references"] as ArrayList<String>
+
+                    for (url in referenceURLs) {
+                        imageReferences.add(storage.getReferenceFromUrl(url))
+                    }
+
+                    imageContainer.adapter = RecyclerViewAdapter(imageReferences, this.context!!)
+                } else {
+                    Log.d("ReferenceView", "Could not find specified cosplay")
+                }
+            }
+    }
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated

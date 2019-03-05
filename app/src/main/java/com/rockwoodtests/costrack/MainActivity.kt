@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
         val cosplayID = v.tag as String
 
         val intent = Intent(this, EditCosplay::class.java)
-        intent.putExtra("cosplayID", cosplayID) // TODO: Change to ID and use flag to signify if it is for a cosplay or a component
+        intent.putExtra("ID", cosplayID)
         startActivity(intent)
     }
 

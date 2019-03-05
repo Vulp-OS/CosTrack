@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import kotlinx.android.synthetic.main.activity_edit_component.*
@@ -16,8 +17,9 @@ import kotlinx.android.synthetic.main.content_edit_component.*
 
 private const val NUM_PAGES = 3
 
-class EditComponent: AppCompatActivity(), ComponentView.OnFragmentInteractionListener, ReferenceView.OnFragmentInteractionListener, ToolView.OnFragmentInteractionListener, StatView.OnFragmentInteractionListener{
+class EditComponent: AppCompatActivity(), ReferenceView.OnFragmentInteractionListener, ToolView.OnFragmentInteractionListener, StatView.OnFragmentInteractionListener{
 
+    private var componentID: String? = null
     private var cosplayID: String? = null
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
@@ -46,9 +48,14 @@ class EditComponent: AppCompatActivity(), ComponentView.OnFragmentInteractionLis
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        componentID = intent.extras?.getString("componentID")
         cosplayID = intent.extras?.getString("cosplayID")
         val data = Bundle()
-        data.putString("cosplayID", cosplayID)  // TODO: Change to ID and use flag to signify if it is for a cosplay or a component
+        data.putString("ID", componentID)
+        data.putInt("type", 1)
+
+        Log.d("EditComponent", "componentID: $componentID")
+        Log.d("EditComponent", "cosplayID: $cosplayID")
 
         pagerManager = mainComponentContainer
         val pagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager, data)
@@ -74,12 +81,16 @@ class EditComponent: AppCompatActivity(), ComponentView.OnFragmentInteractionLis
         return true
     }
 
-    override fun onBackPressed() {
+    override fun onBackPressed() {          // override the default behavior of pressing back, as the suspended view will not re-start with the proper arguments normally
         //super.onBackPressed()
         val intent = Intent(this, EditCosplay::class.java)
-        intent.putExtra("cosplayID", cosplayID)
+        intent.putExtra("ID", cosplayID)
         startActivity(intent)
         finish()
+    }
+
+    fun uploadNewReference(v: View) {
+
     }
 
     private inner class ScreenSlidePagerAdapter(fm: FragmentManager, private val data: Bundle) : FragmentStatePagerAdapter(fm) {
@@ -89,8 +100,6 @@ class EditComponent: AppCompatActivity(), ComponentView.OnFragmentInteractionLis
             when (position) {
                 0  -> {
                     val rv = ReferenceView()
-                    val specialData = data
-                    specialData.putString("type", "component")
                     rv.arguments = data
                     return rv
                 }

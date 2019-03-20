@@ -1,6 +1,8 @@
 package com.rockwoodtests.costrack
 
+import android.app.Activity.RESULT_OK
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -53,8 +55,8 @@ class ReferenceView : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        Log.d("ReferenceView", "Provided ID is: $id")
-        Log.d("ReferenceView", "Provided Type is: $type")
+        Log.d(TAG, "Provided ID is: $id")
+        Log.d(TAG, "Provided Type is: $type")
 
         loadReferences()
     }
@@ -102,7 +104,7 @@ class ReferenceView : Fragment() {
 
                     imageContainer.adapter = RecyclerViewAdapter(imageReferences, this.context!!)
                 } else {
-                    Log.d("ReferenceView", "Could not find specified cosplay")
+                    Log.d(TAG, "Could not find specified cosplay")
                 }
             }
     }
@@ -124,10 +126,33 @@ class ReferenceView : Fragment() {
 
                     imageContainer.adapter = RecyclerViewAdapter(imageReferences, this.context!!)
                 } else {
-                    Log.d("ReferenceView", "Could not find specified cosplay")
+                    Log.d(TAG, "Could not find specified cosplay")
                 }
             }
     }
+
+//    fun selectImage(v: View) {
+//        val intent = Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+//
+//        startActivityForResult(intent, RESULT_LOAD_IMAGE)
+//    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && data != null) {
+
+        }
+    }
+
+//    private fun uploadImageForCosplay() {
+//
+//    }
+//
+//    private fun uploadImageForComponent() {
+//
+//    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -162,5 +187,7 @@ class ReferenceView : Fragment() {
                     putString(ARG_PARAM2, param2)
                 }
             }
+        private const val TAG = "ReferenceView"
+        private const val RESULT_LOAD_IMAGE = 1
     }
 }

@@ -28,5 +28,8 @@
     <string name="inputComponentFoundItem">Found Item</string>
     <string name="inputComponentBoughtItem">Bought Item</string>
     <string name="inputComponentMadeItem">Made Item</string>
+    <string name="set_start_date">Set Start Date</string>
+    <string name="set_due_date">Set Due Date</string>
+    <string name="advertisement">Advertisement</string>
 
 </resources>

@@ -11,6 +11,8 @@ import android.view.View
 import com.firebase.ui.auth.AuthUI
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -20,37 +22,44 @@ import kotlinx.android.synthetic.main.ad_view.*
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.cosplay_view.view.*
 
-
 class MainActivity : AppCompatActivity() {
 
     private var user = FirebaseAuth.getInstance().currentUser
     private var db = FirebaseFirestore.getInstance()
     private var storage = FirebaseStorage.getInstance()
+    private val api = GoogleApiAvailability.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        // Force user to sign in if they are not already signed in to an account
-        if (user == null) {
-            val providers = arrayListOf(
-                AuthUI.IdpConfig.GoogleBuilder().build()
-            )
+        if (api.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
+            // Force user to sign in if they are not already signed in to an account
+            if (user == null) {
+                val providers = arrayListOf(
+                    AuthUI.IdpConfig.GoogleBuilder().build()
+                )
 
-            startActivityForResult(
-                AuthUI.getInstance()
-                    .createSignInIntentBuilder()
-                    .setAvailableProviders(providers)
-                    .build(), RC_SIGN_IN)
+                startActivityForResult(
+                    AuthUI.getInstance()
+                        .createSignInIntentBuilder()
+                        .setAvailableProviders(providers)
+                        .build(), RC_SIGN_IN
+                )
+            } else {
+                loadContent()
+            }
+        } else {
+            api.getErrorDialog(this, api.isGooglePlayServicesAvailable(this), RC_SIGN_IN).show()
         }
+    }
 
-        if((0..10).random() >= 6)
+    private fun loadContent() {
+        if ((0..10).random() >= 6)
             showAd()
 
-        for (i in (0..5)) {
-            loadCosplays()
-        }
+        loadCosplays()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -77,6 +86,10 @@ class MainActivity : AppCompatActivity() {
 
             if (resultCode == Activity.RESULT_OK) {
                 user = FirebaseAuth.getInstance().currentUser
+                db = FirebaseFirestore.getInstance()
+                storage = FirebaseStorage.getInstance()
+
+                loadContent()
             } else {
                 TODO("Handle failed login")
             }
@@ -96,6 +109,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadCosplays() {
+        Log.d(TAG, "loadCosplays: " + user?.uid)
+
+
         db.collection("cosplays").whereEqualTo("owner", user!!.uid).get()
             .addOnSuccessListener { documents ->
                 if (documents != null) {

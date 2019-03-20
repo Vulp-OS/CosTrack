@@ -12,10 +12,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.fragment_reference_view.*
-import kotlinx.android.synthetic.main.reference_view.view.*
 
-
-// TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "ID"
 private const val ARG_PARAM2 = "type"
@@ -33,14 +30,14 @@ class ReferenceView : Fragment() {
     private var db = FirebaseFirestore.getInstance()
     private var storage = FirebaseStorage.getInstance()
 
-    private var ID: String? = null
+    private var id: String? = null
     private var type: Int? = null
     private var listener: OnFragmentInteractionListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            ID = it.getString(ARG_PARAM1)
+            id = it.getString(ARG_PARAM1)
             type = it.getInt(ARG_PARAM2)
         }
     }
@@ -56,23 +53,23 @@ class ReferenceView : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        Log.d("ReferenceView", "Provided ID is: $ID")
+        Log.d("ReferenceView", "Provided ID is: $id")
         Log.d("ReferenceView", "Provided Type is: $type")
 
         loadReferences()
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    fun onButtonPressed(uri: Uri) {
-        listener?.onFragmentInteraction(uri)
-    }
+//    // TODO: Rename method, update argument and hook method into UI event
+//    fun onButtonPressed(uri: Uri) {
+//        listener?.onFragmentInteraction(uri)
+//    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is OnFragmentInteractionListener) {
             listener = context
         } else {
-            throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
+            throw RuntimeException("$context must implement OnFragmentInteractionListener")
         }
     }
 
@@ -90,14 +87,17 @@ class ReferenceView : Fragment() {
     }
 
     private fun loadReferencesForCosplay() {
-        db.collection("cosplays").document(ID as String).get()
+        db.collection("cosplays").document(id as String).get()
             .addOnSuccessListener { document ->
                 if (document != null) {
                     val imageReferences = ArrayList<StorageReference>()
-                    val referenceURLs = document.data!!["references"] as ArrayList<String>
 
-                    for (url in referenceURLs) {
-                        imageReferences.add(storage.getReferenceFromUrl(url))
+                    if (document.data?.get("references") != null) {
+                        val referenceURLs = document.data!!["references"] as ArrayList<*>
+
+                        for (url in referenceURLs) {
+                            imageReferences.add(storage.getReferenceFromUrl(url as String))
+                        }
                     }
 
                     imageContainer.adapter = RecyclerViewAdapter(imageReferences, this.context!!)
@@ -108,14 +108,18 @@ class ReferenceView : Fragment() {
     }
 
     private fun loadReferencesForComponent() {
-        db.collection("components").document(ID as String).get()
+        db.collection("components").document(id as String).get()
             .addOnSuccessListener { document ->
                 if (document != null) {
                     val imageReferences = ArrayList<StorageReference>()
-                    val referenceURLs = document.data!!["references"] as ArrayList<String>
 
-                    for (url in referenceURLs) {
-                        imageReferences.add(storage.getReferenceFromUrl(url))
+                    if (document.data?.get("references") != null) {
+
+                        val referenceURLs = document.data!!["references"] as ArrayList<*>
+
+                        for (url in referenceURLs) {
+                            imageReferences.add(storage.getReferenceFromUrl(url as String))
+                        }
                     }
 
                     imageContainer.adapter = RecyclerViewAdapter(imageReferences, this.context!!)

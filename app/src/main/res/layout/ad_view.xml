@@ -26,7 +26,7 @@
             <com.google.android.gms.ads.AdView
                 android:id="@+id/adView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="100dp"
                 android:layout_gravity="top|center"
                 app:adSize="SMART_BANNER"
                 app:adUnitId="ca-app-pub-3940256099942544/6300978111" />
@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="10dp"
-                android:text="Advertisement"
+                android:text="@string/advertisement"
                 android:textSize="20sp" />
         </LinearLayout>
     </android.support.v7.widget.CardView>

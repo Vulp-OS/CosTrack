@@ -59,10 +59,10 @@ class ComponentView : Fragment() {
         loadComponents()
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    fun onButtonPressed(uri: Uri) {
-        listener?.onFragmentInteraction(uri)
-    }
+//    // TODO: Rename method, update argument and hook method into UI event
+//    fun onButtonPressed(uri: Uri) {
+//        listener?.onFragmentInteraction(uri)
+//    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -82,26 +82,31 @@ class ComponentView : Fragment() {
         db.collection("cosplays").document(cosplayID as String).get()
             .addOnSuccessListener { document ->
                 if (document != null) {
-                    val componentKeys = document.data!!["components"] as ArrayList<*>
+                    if (document.data?.get("components") != null) {
+                        @Suppress("UNCHECKED_CAST")
+                        val componentKeys = document.data!!["components"] as ArrayList<*>
 
-                    for (key in componentKeys) {
-                        db.collection("components").document(key as String).get()
-                            .addOnSuccessListener { componentDocument ->
-                                if (componentDocument != null) {
-                                    val inflatedLayout = layoutInflater.inflate(R.layout.component_view, cosplayContainer, false)
-                                    inflatedLayout.componentCardView.tag = componentDocument.id
+                        for (key in componentKeys) {
+                            db.collection("components").document(key as String).get()
+                                .addOnSuccessListener { componentDocument ->
+                                    if (componentDocument != null) {
+                                        val inflatedLayout =
+                                            layoutInflater.inflate(R.layout.component_view, cosplayContainer, false)
+                                        inflatedLayout.componentCardView.tag = componentDocument.id
 
-                                    inflatedLayout.textView1.text = componentDocument.data!!["name"] as String
+                                        inflatedLayout.textView1.text = componentDocument.data!!["name"] as String
 
-                                    val coverImageRef = storage.getReferenceFromUrl(componentDocument.data!!["cover_image"] as String)
-                                    GlideApp.with(this).load(coverImageRef).into(inflatedLayout.imageView1)
+                                        val coverImageRef =
+                                            storage.getReferenceFromUrl(componentDocument.data!!["cover_image"] as String)
+                                        GlideApp.with(this).load(coverImageRef).into(inflatedLayout.imageView1)
 
-                                    cosplayContainer.addView(inflatedLayout)
+                                        cosplayContainer.addView(inflatedLayout)
 
-                                } else {
-                                    Log.d("ComponentView", "Could not find specified component")
+                                    } else {
+                                        Log.d("ComponentView", "Could not find specified component")
+                                    }
                                 }
-                            }
+                        }
                     }
 
                 } else {

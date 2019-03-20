@@ -54,7 +54,7 @@ class NewCosplay : AppCompatActivity() {
             } catch (e: Exception) {
                 Snackbar.make(v, "Could not parse fields. Please ensure contents are accurate.", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show()
-                Log.e(TAG, "Error Parsing Dates: ", e)
+                Log.e(TAG, "Error Parsing Data: ", e)
             }
 
             // Save Parsed information into FireStore

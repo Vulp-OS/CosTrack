@@ -11,7 +11,7 @@ import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.MenuItem
-import android.view.View
+//import android.view.View
 import kotlinx.android.synthetic.main.activity_edit_component.*
 import kotlinx.android.synthetic.main.content_edit_component.*
 
@@ -51,7 +51,7 @@ class EditComponent: AppCompatActivity(), ReferenceView.OnFragmentInteractionLis
         componentID = intent.extras?.getString("componentID")
         cosplayID = intent.extras?.getString("cosplayID")
         val data = Bundle()
-        data.putString("ID", componentID)
+        data.putString("id", componentID)
         data.putInt("type", 1)
 
         Log.d("EditComponent", "componentID: $componentID")
@@ -77,21 +77,19 @@ class EditComponent: AppCompatActivity(), ReferenceView.OnFragmentInteractionLis
                 onBackPressed()
             }
         }
-
         return true
     }
 
     override fun onBackPressed() {          // override the default behavior of pressing back, as the suspended view will not re-start with the proper arguments normally
-        //super.onBackPressed()
         val intent = Intent(this, EditCosplay::class.java)
-        intent.putExtra("ID", cosplayID)
+        intent.putExtra("id", cosplayID)
         startActivity(intent)
         finish()
     }
 
-    fun uploadNewReference(v: View) {
-
-    }
+//    fun uploadNewReference(v: View) {
+//
+//    }
 
     private inner class ScreenSlidePagerAdapter(fm: FragmentManager, private val data: Bundle) : FragmentStatePagerAdapter(fm) {
         override fun getCount(): Int = NUM_PAGES
@@ -131,6 +129,4 @@ class EditComponent: AppCompatActivity(), ReferenceView.OnFragmentInteractionLis
             bnv.menu.getItem(p0).isChecked = true
         }
     }
-
-
 }

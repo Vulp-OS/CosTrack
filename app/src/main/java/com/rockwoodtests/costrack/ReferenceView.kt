@@ -14,7 +14,7 @@ import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.fragment_reference_view.*
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "ID"
+private const val ARG_PARAM1 = "id"
 private const val ARG_PARAM2 = "type"
 
 /**

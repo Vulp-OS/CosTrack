@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity() {
         val cosplayID = v.tag as String
 
         val intent = Intent(this, EditCosplay::class.java)
-        intent.putExtra("ID", cosplayID)
+        intent.putExtra("id", cosplayID)
         startActivity(intent)
     }
 

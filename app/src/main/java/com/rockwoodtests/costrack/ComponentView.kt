@@ -17,7 +17,7 @@ import kotlinx.android.synthetic.main.component_view.view.*
 import kotlinx.android.synthetic.main.fragment_component_view.*
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "ID"
+private const val ARG_PARAM1 = "id"
 
 /**
  * A simple [Fragment] subclass.
@@ -39,6 +39,11 @@ class ComponentView : Fragment() {
         super.onCreate(savedInstanceState)
         arguments?.let {
             cosplayID = it.getString(ARG_PARAM1)
+            Log.d(TAG, "CosplayID: $cosplayID")
+        }
+
+        arguments?.keySet()?.forEach {
+            Log.d(TAG, "Argument KeySet: $it")
         }
     }
 
@@ -83,7 +88,6 @@ class ComponentView : Fragment() {
             .addOnSuccessListener { document ->
                 if (document != null) {
                     if (document.data?.get("components") != null) {
-                        @Suppress("UNCHECKED_CAST")
                         val componentKeys = document.data!!["components"] as ArrayList<*>
 
                         for (key in componentKeys) {
@@ -158,5 +162,7 @@ class ComponentView : Fragment() {
                     putString(ARG_PARAM1, cosplayID)
                 }
             }
+
+        private const val TAG = "ComponentView"
     }
 }

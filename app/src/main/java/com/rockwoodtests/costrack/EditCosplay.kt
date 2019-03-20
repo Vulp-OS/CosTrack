@@ -18,7 +18,7 @@ private const val NUM_PAGES = 4
 
 class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionListener, ReferenceView.OnFragmentInteractionListener, ToolView.OnFragmentInteractionListener, StatView.OnFragmentInteractionListener {
 
-    private var ID: String? = null
+    private var id: String? = null
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -51,12 +51,13 @@ class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionList
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        ID = intent.extras?.getString("ID")
-        Log.d("EditCosplay", "CosplayID: $ID")
+        id = intent.extras?.getString("id")
 
         val data = Bundle()
-        data.putString("ID", ID)
+        data.putString("id", id)
         data.putInt("type", 0)      // type 0 = Cosplay, type 1 = Component;    this allows the fragment to know what it is supposed to grab
+
+        Log.d(TAG, "CosplayID: $id")
 
         pagerManager = mainCosplayContainer
         val pagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager, data)
@@ -77,13 +78,16 @@ class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionList
 
         val intent = Intent(this, EditComponent::class.java)
         intent.putExtra("componentID", componentID)
-        intent.putExtra("cosplayID", ID)
+        intent.putExtra("cosplayID", id)
         startActivity(intent)
         finish()
     }
 
     fun createNewComponent(v: View) {
-        startActivity(Intent(this, NewComponent::class.java))
+        val intent = Intent(this, NewComponent::class.java)
+        intent.putExtra("id", id)
+
+        startActivity(intent)
     }
 
     fun uploadNewReference(v: View) {
@@ -137,4 +141,7 @@ class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionList
         }
     }
 
+    companion object {
+        private const val TAG = "EditCosplay"
+    }
 }

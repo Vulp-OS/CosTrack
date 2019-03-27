@@ -1,16 +1,14 @@
 <resources>
     <string name="app_name">Cos Track</string>
     <string name="action_settings">Settings</string>
-    <string name="sample_text_1">Sample Cosplay</string>
-    <string name="sample_text_2">Sample Component</string>
     <string name="content_description_cover_image">This is a cover image</string>
     <string name="content_description_reference_images">This is a reference image</string>
     <string name="title_activity_new_cosplay">New Cosplay</string>
     <string name="inputCosplayNameHint">Cosplay Name</string>
     <string name="inputCosplaySeriesHint">Series Name</string>
     <string name="inputCosplayStartDateHint">Start Date</string>
-    <string name="inputCosplayDueDateHint">Due Date (Optional)</string>
-    <string name="inputCosplayBudgetHint">Budget (Optional)</string>
+    <string name="inputCosplayDueDateHint">Due Date</string>
+    <string name="inputCosplayBudgetHint">Budget</string>
     <string name="buttonUploadCosplayImage">Upload Cover Photo</string>
     <string name="title_activity_edit_cosplay">Edit Cosplay</string>
     <string name="title_activity_new_component">New Component</string>
@@ -20,10 +18,9 @@
     <string name="title_tools">Tools</string>
     <string name="title_stats">Stats</string>
     <string name="title_activity_edit_component_components">EditComponentComponents</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_references">References</string>
     <string name="inputComponentNameHint">Component Name</string>
-    <string name="inputComponentAmountSpent">Amount Spent (Optional)</string>
+    <string name="inputComponentAmountSpent">Amount Spent</string>
     <string name="inputComponentComponentType">Component Type</string>
     <string name="inputComponentFoundItem">Found Item</string>
     <string name="inputComponentBoughtItem">Bought Item</string>

@@ -1,9 +1,13 @@
 package com.rockwoodtests.costrack
 
+import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
@@ -11,14 +15,26 @@ import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_edit_cosplay.*
 import kotlinx.android.synthetic.main.content_edit_cosplay.*
+import kotlinx.android.synthetic.main.fragment_reference_view.*
+import java.io.ByteArrayOutputStream
+import java.io.FileInputStream
+import java.util.*
 
-private const val NUM_PAGES = 4
+private const val NUM_PAGES = 3
 
 class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionListener, ReferenceView.OnFragmentInteractionListener, ToolView.OnFragmentInteractionListener, StatView.OnFragmentInteractionListener {
 
     private var id: String? = null
+
+    private var user = FirebaseAuth.getInstance().currentUser!!
+    private var db = FirebaseFirestore.getInstance()
+    private var storage = FirebaseStorage.getInstance()
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -32,10 +48,6 @@ class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionList
             }
             R.id.navigation_tools -> {
                 pagerManager.setCurrentItem(2, true)
-                return@OnNavigationItemSelectedListener true
-            }
-            R.id.navigation_stats -> {
-                pagerManager.setCurrentItem(3, true)
                 return@OnNavigationItemSelectedListener true
             }
         }
@@ -63,7 +75,7 @@ class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionList
         val pagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager, data)
         val pageChangeListener = ScreenSlidePageChangeListener(cosplay_navigation)
         pagerManager.adapter = pagerAdapter
-        pagerManager.offscreenPageLimit = 3
+        pagerManager.offscreenPageLimit = 2
         pagerManager.addOnPageChangeListener(pageChangeListener)
 
         cosplay_navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
@@ -90,8 +102,38 @@ class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionList
         startActivity(intent)
     }
 
-    fun uploadNewReference(v: View) {
+//    fun uploadNewReference(v: View) {
+//        val intent = Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+//
+//        startActivityForResult(intent, RESULT_LOAD_IMAGE)
+//    }
 
+    private fun uploadImage(uri: Uri) {
+        val uuid = UUID.randomUUID()
+        val path = user.uid + "/" + id + "/" + uuid
+
+        val imageRef = storage.reference.child(path)
+
+        imageRef.putFile(uri).addOnSuccessListener {
+            imageRef.downloadUrl.addOnSuccessListener {
+                db.collection("cosplays").document(id as String)
+                    .update("references", FieldValue.arrayUnion(it.toString()))
+                    .addOnSuccessListener {
+                        Snackbar.make(fabUploadImage, "Image Successfully Uploaded", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show()
+                    }
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == RESULT_LOAD_IMAGE && resultCode == Activity.RESULT_OK && data != null) {
+            if (data.data != null) {
+                uploadImage(data.data!!)
+            }
+        }
     }
 
     private inner class ScreenSlidePagerAdapter(fm: FragmentManager, private val data: Bundle) : FragmentStatePagerAdapter(fm) {
@@ -113,11 +155,6 @@ class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionList
                     val tv = ToolView()
                     tv.arguments = data
                     return tv
-                }
-                3 -> {
-                    val sv = StatView()
-                    sv.arguments = data
-                    return sv
                 }
             }
             val cv = ComponentView()
@@ -143,5 +180,6 @@ class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionList
 
     companion object {
         private const val TAG = "EditCosplay"
+        private const val RESULT_LOAD_IMAGE = 1
     }
 }

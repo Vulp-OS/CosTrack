@@ -47,7 +47,6 @@ class NewCosplay : AppCompatActivity() {
                 cosplayData["budget"] = Integer.parseInt(inputCosplayBudget.text.toString())
                 cosplayData["money_spent"] = 0
                 cosplayData["cover_image"] = "gs://costrack.appspot.com/defaults/new-cosplay.png"
-                cosplayData["has_references"] = false
                 cosplayData["due_date"] = Integer.parseInt(parsedDueDate.time.toString())       // Storing time in milliseconds from epoch
                 cosplayData["start_date"] = Integer.parseInt(parsedStartDate.time.toString())
                 cosplayData["components"] = ArrayList<String>()

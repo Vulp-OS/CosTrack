@@ -1,6 +1,5 @@
 package com.rockwoodtests.costrack
 
-import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -36,6 +35,8 @@ class ReferenceView : Fragment() {
     private var type: Int? = null
     private var listener: OnFragmentInteractionListener? = null
 
+    private var adapter: ReferenceViewRecyclerViewAdapter? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -58,6 +59,19 @@ class ReferenceView : Fragment() {
         Log.d(TAG, "Provided ID is: $id")
         Log.d(TAG, "Provided Type is: $type")
 
+        fabUploadImage.setOnClickListener {
+            val intent = Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+
+            activity?.startActivityForResult(intent, RESULT_LOAD_IMAGE)
+        }
+
+        refreshContainer.setOnRefreshListener {
+            adapter?.clear()
+            refreshList()
+
+            refreshContainer.isRefreshing = false
+        }
+
         loadReferences()
     }
 
@@ -79,12 +93,62 @@ class ReferenceView : Fragment() {
         super.onDetach()
         listener = null
     }
+    fun refreshList() {
+        when(type) {
+            0 -> refreshListForCosplay()
+            1 -> refreshListForComponent()
+            else -> Log.d(TAG, "Unknown type specified")
+        }
+    }
+
+    private fun refreshListForCosplay() {
+        db.collection("cosplays").document(id as String).get()
+            .addOnSuccessListener { document ->
+                if (document != null) {
+                    val imageReferences = ArrayList<StorageReference>()
+
+                    if (document.data?.get("references") != null) {
+                        val referenceURLs = document.data!!["references"] as ArrayList<*>
+
+                        for (url in referenceURLs) {
+                            imageReferences.add(storage.getReferenceFromUrl(url as String))
+                        }
+                    }
+
+                    adapter!!.addAll(imageReferences)
+                } else {
+                    Log.d(TAG, "Could not find specified cosplay")
+                }
+            }
+    }
+
+    private fun refreshListForComponent() {
+        db.collection("components").document(id as String).get()
+            .addOnSuccessListener { document ->
+                if (document != null) {
+                    val imageReferences = ArrayList<StorageReference>()
+
+                    if (document.data?.get("references") != null) {
+
+                        val referenceURLs = document.data!!["references"] as ArrayList<*>
+
+                        for (url in referenceURLs) {
+                            imageReferences.add(storage.getReferenceFromUrl(url as String))
+                        }
+                    }
+
+                    adapter!!.addAll(imageReferences)
+                } else {
+                    Log.d(TAG, "Could not find specified cosplay")
+                }
+            }
+    }
 
     private fun loadReferences() {
         when(type) {
             0 -> loadReferencesForCosplay()
             1 -> loadReferencesForComponent()
-            else -> Log.d("ReferenceView", "Unknown type specified")
+            else -> Log.d(TAG, "Unknown type specified")
         }
     }
 
@@ -102,7 +166,8 @@ class ReferenceView : Fragment() {
                         }
                     }
 
-                    imageContainer.adapter = RecyclerViewAdapter(imageReferences, this.context!!)
+                    adapter = ReferenceViewRecyclerViewAdapter(imageReferences, this.context!!)
+                    imageContainer.adapter = adapter
                 } else {
                     Log.d(TAG, "Could not find specified cosplay")
                 }
@@ -123,35 +188,28 @@ class ReferenceView : Fragment() {
                             imageReferences.add(storage.getReferenceFromUrl(url as String))
                         }
                     }
-
-                    imageContainer.adapter = RecyclerViewAdapter(imageReferences, this.context!!)
+                    adapter = ReferenceViewRecyclerViewAdapter(imageReferences, this.context!!)
+                    imageContainer.adapter = adapter
                 } else {
                     Log.d(TAG, "Could not find specified cosplay")
                 }
             }
     }
 
-//    fun selectImage(v: View) {
-//        val intent = Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-//
-//        startActivityForResult(intent, RESULT_LOAD_IMAGE)
-//    }
+    fun zoomFromThumb(imageID: Int) {
+        zoomInCosplayContainer(imageID)
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && data != null) {
-
-        }
+//        when(type) {
+//            0 -> zoomInCosplayContainer(imageID)
+//            1 -> zoomInComponentContainer(imageID)
+//            else -> Log.d(TAG, "Unknown type specified: $type")
+//        }
     }
 
-//    private fun uploadImageForCosplay() {
-//
-//    }
-//
-//    private fun uploadImageForComponent() {
-//
-//    }
+    private fun zoomInCosplayContainer(imageID: Int) {
+        //TODO: Open another activity that shows the specified image.
+    }
+
 
     /**
      * This interface must be implemented by activities that contain this
@@ -188,6 +246,6 @@ class ReferenceView : Fragment() {
                 }
             }
         private const val TAG = "ReferenceView"
-        private const val RESULT_LOAD_IMAGE = 1
+        private const val RESULT_LOAD_IMAGE=1
     }
 }

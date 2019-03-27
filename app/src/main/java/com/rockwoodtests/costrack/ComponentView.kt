@@ -107,14 +107,14 @@ class ComponentView : Fragment() {
                                         cosplayContainer.addView(inflatedLayout)
 
                                     } else {
-                                        Log.d("ComponentView", "Could not find specified component")
+                                        Log.d(TAG, "Could not find specified component")
                                     }
                                 }
                         }
                     }
 
                 } else {
-                    Log.d("ComponentView", "Could not find specified cosplay")
+                    Log.d(TAG, "Could not find specified cosplay")
                 }
             }
 

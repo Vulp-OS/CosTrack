@@ -50,7 +50,6 @@ class NewComponent : AppCompatActivity() {
                 componentData["money_spent"] = Integer.parseInt(inputComponentAmountSpent.text.toString())
                 componentData["type"] = type
                 componentData["cover_image"] = "gs://costrack.appspot.com/defaults/new-component.png"
-                componentData["has_references"] = false
                 componentData["references"] = ArrayList<String>()
                 componentData["time_logged"] = 0
 

@@ -14,9 +14,4 @@
         android:icon="@android:drawable/ic_menu_manage"
         android:title="@string/title_tools" />
 
-    <item
-        android:id="@+id/navigation_stats"
-        android:icon="@android:drawable/ic_menu_info_details"
-        android:title="@string/title_stats" />
-
 </menu>

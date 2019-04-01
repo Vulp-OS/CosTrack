@@ -28,5 +28,15 @@
     <string name="set_start_date">Set Start Date</string>
     <string name="set_due_date">Set Due Date</string>
     <string name="advertisement">Advertisement</string>
+    <string name="cosplay_name">Cosplay Name:</string>
+    <string name="number_of_components">Number of Components:</string>
+    <string name="money_spent">Money Spent</string>
+    <string name="time_spent">Time Spent</string>
+    <string name="start_date">Start Date</string>
+    <string name="due_date">Due Date</string>
+    <string name="cosplay_summary">Cosplay Summary</string>
+    <string name="misc_timer">Miscellaneous Timer</string>
+    <string name="misc_time_spent">Misc. Time Spent</string>
+    <string name="update_cosplay_info">Update Cosplay Info</string>
 
 </resources>

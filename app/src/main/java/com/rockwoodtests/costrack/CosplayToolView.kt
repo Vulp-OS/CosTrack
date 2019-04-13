@@ -8,7 +8,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.android.synthetic.main.fragment_cosplay_tool_view.*
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -19,24 +20,24 @@ private const val ARG_PARAM2 = "type"
 /**
  * A simple [Fragment] subclass.
  * Activities that contain this fragment must implement the
- * [ToolView.OnFragmentInteractionListener] interface
+ * [CosplayToolView.OnFragmentInteractionListener] interface
  * to handle interaction events.
- * Use the [ToolView.newInstance] factory method to
+ * Use the [CosplayToolView.newInstance] factory method to
  * create an instance of this fragment.
  *
  */
-class ToolView : Fragment() {
-    private var db = FirebaseStorage.getInstance()
+class CosplayToolView : Fragment() {
+    private var db = FirebaseFirestore.getInstance()
 
     private var id: String? = null
-    private var type: String? = null
+    private var type: Int? = null
     private var listener: OnFragmentInteractionListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             id = it.getString(ARG_PARAM1)
-            type = it.getString(ARG_PARAM2)
+            type = it.getInt(ARG_PARAM2)
         }
     }
 
@@ -45,7 +46,7 @@ class ToolView : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_tool_view, container, false)
+        return inflater.inflate(R.layout.fragment_cosplay_tool_view, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -53,6 +54,43 @@ class ToolView : Fragment() {
 
         Log.d(TAG, "Provided ID is: $id")
         Log.d(TAG, "Provided Type is: $type")
+
+        loadCosplayInfo()
+    }
+
+    private fun loadCosplayInfo() {
+        db.collection("cosplays").document(id!!).get().addOnSuccessListener { cosplayDocument ->
+            if (cosplayDocument != null) {
+                dataCosplayName.text = cosplayDocument.data!!["name"] as String
+                dataNumberComponents.text = (cosplayDocument.data!!["components"] as ArrayList<*>).size.toString()
+
+                // Determine how much money has been spent on all cosplays. Also add up time spent at same time
+                val componentKeys = cosplayDocument.data!!["components"] as ArrayList<*>
+
+                val miscTimeSpent = cosplayDocument.data!!["time_logged"] as Long
+
+                dataMoneySpent.text = 0.toString()
+                dataTimeSpent.text = miscTimeSpent.toString()
+                dataMiscTimeSpent.text = miscTimeSpent.toString()
+
+                for (key in componentKeys) {
+                    db.collection("components").document(key as String).get()
+                        .addOnSuccessListener {
+                            if (it != null) {
+                                var moneyPlaceholder = (dataMoneySpent.text as String).toLong()
+                                moneyPlaceholder += it.data!!["money_spent"] as Long
+                                dataMoneySpent.text = moneyPlaceholder.toString()
+
+                                var timePlaceholder = (dataTimeSpent.text as String).toLong()
+                                timePlaceholder += it.data!!["time_logged"] as Long
+                                dataTimeSpent.text = timePlaceholder.toString()
+                            }
+                        }
+                }
+
+                //TODO: Fill Start/Due data later
+            }
+        }
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -97,17 +135,17 @@ class ToolView : Fragment() {
          *
          * @param param1 Parameter 1.
          * @param param2 Parameter 2.
-         * @return A new instance of fragment ToolView.
+         * @return A new instance of fragment CosplayToolView.
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
-            ToolView().apply {
+            CosplayToolView().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)
                 }
             }
-        private const val TAG = "ToolView"
+        private const val TAG = "CosplayToolView"
     }
 }

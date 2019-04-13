@@ -10,6 +10,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".CosplayReferenceViewer"
+            android:label="@string/title_activity_cosplay_reference_viewer"
+            android:parentActivityName=".EditCosplay"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.rockwoodtests.costrack.EditCosplay" />
+        </activity>
+        <activity
+            android:name=".ImageViewer"
+            android:label="@string/title_activity_image_viewer"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".EditComponent"
             android:label="@string/title_activity_edit_component"
             android:theme="@style/AppTheme.NoActionBar">

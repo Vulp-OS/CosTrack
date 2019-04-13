@@ -31,12 +31,26 @@
     <string name="cosplay_name">Cosplay Name:</string>
     <string name="number_of_components">Number of Components:</string>
     <string name="money_spent">Money Spent</string>
-    <string name="time_spent">Time Spent</string>
+    <string name="time_spent">Total Time Spent</string>
     <string name="start_date">Start Date</string>
     <string name="due_date">Due Date</string>
     <string name="cosplay_summary">Cosplay Summary</string>
     <string name="misc_timer">Miscellaneous Timer</string>
     <string name="misc_time_spent">Misc. Time Spent</string>
     <string name="update_cosplay_info">Update Cosplay Info</string>
+    <string name="BlankTimer">00:00:00</string>
+    <string name="start">Start</string>
+    <string name="pause">Pause</string>
+    <string name="finish">Finish</string>
+    <string name="component_summary">Component Summary</string>
+    <string name="component_name">Component Name</string>
+    <string name="timer">Timer</string>
+    <string name="update_component_info">Update Component Info</string>
+    <string name="component_timer">Component Timer</string>
+    <string name="cosplay_timer">Cosplay Timer</string>
+    <string name="history">History</string>
+    <string name="component_type">Component Type</string>
+    <string name="title_activity_image_viewer">ImageViewer</string>
+    <string name="title_activity_cosplay_reference_viewer">CosplayReferenceViewer</string>
 
 </resources>

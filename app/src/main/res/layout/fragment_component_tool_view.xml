@@ -4,47 +4,47 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ToolView"
+    tools:context=".ComponentToolView"
     android:orientation="vertical">
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/constraintCosplaySummary"
+        android:id="@+id/constraintComponentSummary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/lblCosplaySummary"
+            android:id="@+id/lblComponentSummary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:textSize="20sp"
-            android:text="@string/cosplay_summary"
+            android:text="@string/component_summary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/lblCosplayName"
+            android:id="@+id/lblComponentName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginStart="8dp"
-            android:text="@string/cosplay_name"
+            android:text="@string/component_name"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/lblCosplaySummary" />
+            app:layout_constraintTop_toBottomOf="@+id/lblComponentSummary" />
 
         <TextView
-            android:id="@+id/lblNumberComponents"
+            android:id="@+id/lblComponentType"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:text="@string/number_of_components"
+            android:layout_marginStart="8dp"
+            android:text="@string/component_type"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/lblCosplayName" />
+            app:layout_constraintTop_toBottomOf="@+id/lblComponentName" />
 
         <TextView
             android:id="@+id/lblMoneySpent"
@@ -54,7 +54,7 @@
             android:layout_marginTop="8dp"
             android:text="@string/money_spent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/lblNumberComponents" />
+            app:layout_constraintTop_toBottomOf="@+id/lblComponentType" />
 
         <TextView
             android:id="@+id/lblTimeSpent"
@@ -67,16 +67,6 @@
             app:layout_constraintTop_toBottomOf="@+id/lblMoneySpent" />
 
         <TextView
-            android:id="@+id/lblMiscTimeSpent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:text="@string/misc_time_spent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/lblTimeSpent" />
-
-        <TextView
             android:id="@+id/lblStartDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -84,7 +74,7 @@
             android:layout_marginTop="8dp"
             android:text="@string/start_date"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/lblMiscTimeSpent" />
+            app:layout_constraintTop_toBottomOf="@+id/lblTimeSpent" />
 
         <TextView
             android:id="@+id/lblDueDate"
@@ -97,23 +87,23 @@
             app:layout_constraintTop_toBottomOf="@+id/lblStartDate" />
 
         <TextView
-            android:id="@+id/dataCosplayName"
+            android:id="@+id/dataComponentName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:text=""
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/lblCosplayName" />
+            app:layout_constraintTop_toTopOf="@+id/lblComponentName" />
 
         <TextView
-            android:id="@+id/dataNumberComponents"
+            android:id="@+id/dataComponentType"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginTop="8dp"
             android:text=""
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/dataCosplayName" />
+            app:layout_constraintTop_toBottomOf="@+id/dataComponentName" />
 
         <TextView
             android:id="@+id/dataMoneySpent"
@@ -123,7 +113,7 @@
             android:layout_marginTop="8dp"
             android:text=""
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/dataNumberComponents" />
+            app:layout_constraintTop_toBottomOf="@+id/dataComponentType" />
 
         <TextView
             android:id="@+id/dataTimeSpent"
@@ -136,15 +126,6 @@
             app:layout_constraintTop_toBottomOf="@+id/dataMoneySpent" />
 
         <TextView
-            android:id="@+id/dataMiscTimeSpent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/dataTimeSpent"/>
-
-        <TextView
             android:id="@+id/dataStartDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -152,7 +133,7 @@
             android:layout_marginTop="8dp"
             android:text=""
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/dataMiscTimeSpent" />
+            app:layout_constraintTop_toBottomOf="@id/dataTimeSpent" />
 
         <TextView
             android:id="@+id/dataDueDate"
@@ -167,15 +148,14 @@
     </android.support.constraint.ConstraintLayout>
 
     <LinearLayout
+        android:id="@+id/componentTools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
         android:baselineAligned="false"
         android:orientation="horizontal"
         android:weightSum="2"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/constraintCosplaySummary">
+        app:layout_constraintTop_toBottomOf="@+id/constraintComponentSummary">
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="wrap_content"
@@ -187,11 +167,60 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="@string/misc_timer"
+                android:text="@string/component_timer"
                 android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/lblTimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/BlankTimer"
+                android:textSize="28sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/lblTimerContainer" />
+
+            <Button
+                android:id="@+id/btnStartTimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/start"
+                android:onClick="startTimer"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/lblTimer" />
+
+            <Button
+                android:id="@+id/btnPauseTimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="@string/pause"
+                android:onClick="pauseTimer"
+                android:enabled="false"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/lblTimer" />
+
+            <Button
+                android:id="@+id/btnFinishTimer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/finish"
+                android:enabled="false"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btnPauseTimer" />
 
         </android.support.constraint.ConstraintLayout>
 
@@ -205,7 +234,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="@string/update_cosplay_info"
+                android:text="@string/update_component_info"
                 android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -214,4 +243,5 @@
         </android.support.constraint.ConstraintLayout>
 
     </LinearLayout>
+
 </android.support.constraint.ConstraintLayout>

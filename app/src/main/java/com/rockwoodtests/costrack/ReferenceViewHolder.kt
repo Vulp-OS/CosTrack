@@ -21,7 +21,7 @@ class ReferenceViewRecyclerViewAdapter(private val items : ArrayList<StorageRefe
         GlideApp.with(this.context).load(items[position]).into(holder.referenceImage)
 
         holder.referenceImageCardView.setOnClickListener {
-            ReferenceView().zoomFromThumb(holder.referenceImage.id)
+            EditCosplay().zoomInCosplayContainer(items[position].path)
         }
     }
 

@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.SystemClock
 import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
@@ -12,7 +14,6 @@ import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import com.google.firebase.auth.FirebaseAuth
@@ -22,18 +23,25 @@ import com.google.firebase.storage.FirebaseStorage
 //import android.view.View
 import kotlinx.android.synthetic.main.activity_edit_component.*
 import kotlinx.android.synthetic.main.content_edit_component.*
+import kotlinx.android.synthetic.main.fragment_component_tool_view.*
 import kotlinx.android.synthetic.main.fragment_reference_view.*
 import java.util.*
 
 private const val NUM_PAGES = 2
 
-class EditComponent: AppCompatActivity(), ReferenceView.OnFragmentInteractionListener, ToolView.OnFragmentInteractionListener, StatView.OnFragmentInteractionListener{
+class EditComponent: AppCompatActivity(), ReferenceView.OnFragmentInteractionListener, ComponentToolView.OnFragmentInteractionListener, StatView.OnFragmentInteractionListener{
     private var user = FirebaseAuth.getInstance().currentUser!!
     private var db = FirebaseFirestore.getInstance()
     private var storage = FirebaseStorage.getInstance()
 
     private var componentID: String? = null
     private var cosplayID: String? = null
+
+    private var startTime = 0L
+    private var millisecondTime = 0L
+    private var timeBuff = 0L
+    private var totalTime = 0L
+    private val handler = Handler()
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -130,9 +138,34 @@ class EditComponent: AppCompatActivity(), ReferenceView.OnFragmentInteractionLis
         finish()
     }
 
-//    fun uploadNewReference(v: View) {
-//
-//    }
+    fun startTimer(v: View) {
+        startTime = SystemClock.uptimeMillis()
+        handler.postDelayed(runnable, 1000)
+        btnFinishTimer.isEnabled = false
+    }
+
+    fun pauseTimer(v: View) {
+        timeBuff += millisecondTime
+        handler.removeCallbacks(runnable)
+        btnFinishTimer.isEnabled = true
+    }
+
+    private val runnable = object: Runnable {
+        override fun run() {
+            millisecondTime = SystemClock.uptimeMillis() - startTime
+            totalTime = timeBuff + millisecondTime
+            var seconds = totalTime/1000
+            var minutes = seconds / 60
+            val hours = minutes / 60
+
+            minutes %= 60
+            seconds %= 60
+
+            lblTimer.text = ("${String.format("%02d", hours)}:${String.format("%02d", minutes)}:${String.format("%02d", seconds)}")
+
+            handler.postDelayed(this, 1000)
+        }
+    }
 
     private inner class ScreenSlidePagerAdapter(fm: FragmentManager, private val data: Bundle) : FragmentStatePagerAdapter(fm) {
         override fun getCount(): Int = NUM_PAGES
@@ -146,7 +179,7 @@ class EditComponent: AppCompatActivity(), ReferenceView.OnFragmentInteractionLis
                     return rv
                 }
                 1 -> {
-                    val tv = ToolView()
+                    val tv = ComponentToolView()
                     tv.arguments = data
                     return tv
                 }

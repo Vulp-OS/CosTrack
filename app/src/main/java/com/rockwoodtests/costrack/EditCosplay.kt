@@ -2,10 +2,10 @@ package com.rockwoodtests.costrack
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.SystemClock
 import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
@@ -21,20 +21,25 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_edit_cosplay.*
 import kotlinx.android.synthetic.main.content_edit_cosplay.*
+import kotlinx.android.synthetic.main.fragment_cosplay_tool_view.*
 import kotlinx.android.synthetic.main.fragment_reference_view.*
-import java.io.ByteArrayOutputStream
-import java.io.FileInputStream
 import java.util.*
 
 private const val NUM_PAGES = 3
 
-class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionListener, ReferenceView.OnFragmentInteractionListener, ToolView.OnFragmentInteractionListener, StatView.OnFragmentInteractionListener {
+class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionListener, ReferenceView.OnFragmentInteractionListener, CosplayToolView.OnFragmentInteractionListener, StatView.OnFragmentInteractionListener {
 
     private var id: String? = null
 
     private var user = FirebaseAuth.getInstance().currentUser!!
     private var db = FirebaseFirestore.getInstance()
     private var storage = FirebaseStorage.getInstance()
+
+    private var startTime = 0L
+    private var millisecondTime = 0L
+    private var timeBuff = 0L
+    private var totalTime = 0L
+    private val handler = Handler()
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
@@ -102,12 +107,6 @@ class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionList
         startActivity(intent)
     }
 
-//    fun uploadNewReference(v: View) {
-//        val intent = Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-//
-//        startActivityForResult(intent, RESULT_LOAD_IMAGE)
-//    }
-
     private fun uploadImage(uri: Uri) {
         val uuid = UUID.randomUUID()
         val path = user.uid + "/" + id + "/" + uuid
@@ -133,6 +132,42 @@ class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionList
             if (data.data != null) {
                 uploadImage(data.data!!)
             }
+        } else if (requestCode == RESULT_VIEW_IMAGE && resultCode == Activity.RESULT_OK) {
+            Snackbar.make(imageContainer, "Image Viewed", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show()
+        }
+    }
+
+    fun startTimer(v: View) {
+        startTime = SystemClock.uptimeMillis()
+        handler.postDelayed(runnable, 1000)
+        btnStartTimer.isEnabled = false
+        btnFinishTimer.isEnabled = false
+        btnPauseTimer.isEnabled = true
+    }
+
+    fun pauseTimer(v: View) {
+        timeBuff += millisecondTime
+        handler.removeCallbacks(runnable)
+        btnStartTimer.isEnabled = true
+        btnFinishTimer.isEnabled = true
+        btnPauseTimer.isEnabled = false
+    }
+
+    private val runnable = object: Runnable {
+        override fun run() {
+            millisecondTime = SystemClock.uptimeMillis() - startTime
+            totalTime = timeBuff + millisecondTime
+            var seconds = totalTime/1000
+            var minutes = seconds / 60
+            val hours = minutes / 60
+
+            minutes %= 60
+            seconds %= 60
+
+            lblTimer.text = ("${String.format("%02d", hours)}:${String.format("%02d", minutes)}:${String.format("%02d", seconds)}")
+
+            handler.postDelayed(this, 1000)
         }
     }
 
@@ -152,7 +187,7 @@ class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionList
                     return rv
                 }
                 2 -> {
-                    val tv = ToolView()
+                    val tv = CosplayToolView()
                     tv.arguments = data
                     return tv
                 }
@@ -178,8 +213,18 @@ class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionList
         }
     }
 
+    fun zoomInCosplayContainer(imagePath: String) {
+        Log.d(TAG, "Before creating Intent")
+        val intent = Intent(this, CosplayReferenceViewer::class.java)
+        Log.d(TAG, "After creating Intent")
+        intent.putExtra("imagePath", imagePath)
+
+        startActivityForResult(intent, RESULT_VIEW_IMAGE)
+    }
+
     companion object {
         private const val TAG = "EditCosplay"
         private const val RESULT_LOAD_IMAGE = 1
+        private const val RESULT_VIEW_IMAGE = 2
     }
 }

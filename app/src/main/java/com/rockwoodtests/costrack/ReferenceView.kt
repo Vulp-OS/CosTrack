@@ -13,6 +13,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.fragment_reference_view.*
+import kotlinx.android.synthetic.main.reference_view.*
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "id"
@@ -93,7 +94,7 @@ class ReferenceView : Fragment() {
         super.onDetach()
         listener = null
     }
-    fun refreshList() {
+    private fun refreshList() {
         when(type) {
             0 -> refreshListForCosplay()
             1 -> refreshListForComponent()
@@ -196,18 +197,14 @@ class ReferenceView : Fragment() {
             }
     }
 
-    fun zoomFromThumb(imageID: Int) {
-        zoomInCosplayContainer(imageID)
+    fun zoomFromThumb(imagePath: String) {
+        EditCosplay().zoomInCosplayContainer(imagePath)
 
 //        when(type) {
 //            0 -> zoomInCosplayContainer(imageID)
 //            1 -> zoomInComponentContainer(imageID)
 //            else -> Log.d(TAG, "Unknown type specified: $type")
 //        }
-    }
-
-    private fun zoomInCosplayContainer(imageID: Int) {
-        //TODO: Open another activity that shows the specified image.
     }
 
 
@@ -247,5 +244,6 @@ class ReferenceView : Fragment() {
             }
         private const val TAG = "ReferenceView"
         private const val RESULT_LOAD_IMAGE=1
+        private const val RESULT_VIEW_IMAGE = 2
     }
 }

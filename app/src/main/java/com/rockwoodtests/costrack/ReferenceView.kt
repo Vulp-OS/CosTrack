@@ -13,7 +13,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.fragment_reference_view.*
-import kotlinx.android.synthetic.main.reference_view.*
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "id"
@@ -167,7 +166,24 @@ class ReferenceView : Fragment() {
                         }
                     }
 
-                    adapter = ReferenceViewRecyclerViewAdapter(imageReferences, this.context!!)
+                    val listener = object : CustomItemClickListener {
+                        override fun onItemClick(v: View, position: Int, imagePath: String) {
+                            Log.d(TAG, "Before creating Intent")
+                            val intent = Intent(v.context, CosplayReferenceViewer::class.java)
+                            Log.d(TAG, "After creating Intent")
+                            intent.putExtra("imagePath", imagePath)
+
+                            startActivityForResult(intent, RESULT_VIEW_IMAGE)
+
+//                            refreshContainer.visibility = View.GONE
+//                            //fabUploadImage.visibility = View.GONE
+//                            ReferencePhotoContainer.visibility = View.VISIBLE
+//
+//                            GlideApp.with(v).load(imagePath).into(ReferencePhotoContainer)
+                        }
+                    }
+
+                    adapter = ReferenceViewRecyclerViewAdapter(imageReferences, this.context!!, listener)
                     imageContainer.adapter = adapter
                 } else {
                     Log.d(TAG, "Could not find specified cosplay")
@@ -189,7 +205,20 @@ class ReferenceView : Fragment() {
                             imageReferences.add(storage.getReferenceFromUrl(url as String))
                         }
                     }
-                    adapter = ReferenceViewRecyclerViewAdapter(imageReferences, this.context!!)
+
+                    val listener = object : CustomItemClickListener {
+                        override fun onItemClick(v: View, position: Int, imagePath: String) {
+                            Log.d(TAG, "Before creating Intent")
+                            val intent = Intent(v.context, CosplayReferenceViewer::class.java)
+                            Log.d(TAG, "After creating Intent")
+                            intent.putExtra("imagePath", imagePath)
+
+                            startActivityForResult(intent, RESULT_VIEW_IMAGE)
+                        }
+                    }
+
+                    adapter = ReferenceViewRecyclerViewAdapter(imageReferences, this.context!!, listener)
+
                     imageContainer.adapter = adapter
                 } else {
                     Log.d(TAG, "Could not find specified cosplay")
@@ -197,14 +226,24 @@ class ReferenceView : Fragment() {
             }
     }
 
-    fun zoomFromThumb(imagePath: String) {
-        EditCosplay().zoomInCosplayContainer(imagePath)
+    fun zoomFromThumb(v: View, imagePath: String) {
+        zoomInCosplayContainer(v, imagePath)
 
 //        when(type) {
 //            0 -> zoomInCosplayContainer(imageID)
 //            1 -> zoomInComponentContainer(imageID)
 //            else -> Log.d(TAG, "Unknown type specified: $type")
 //        }
+    }
+
+    fun zoomInCosplayContainer(v: View, imagePath: String) {
+        Log.d(TAG, "Before creating Intent")
+        Log.d(TAG, "This: ${this.id}")
+        val intent = Intent(v.context, CosplayReferenceViewer::class.java)
+        Log.d(TAG, "After creating Intent")
+        intent.putExtra("imagePath", imagePath)
+
+        startActivityForResult(intent, RESULT_VIEW_IMAGE)
     }
 
 

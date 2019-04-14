@@ -8,20 +8,25 @@ import android.view.ViewGroup
 import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.reference_view.view.*
 
-class ReferenceViewRecyclerViewAdapter(private val items : ArrayList<StorageReference>, val context: Context) : RecyclerView.Adapter<ReferenceViewRecyclerViewAdapterViewHolder>() {
+class ReferenceViewRecyclerViewAdapter(private val items : ArrayList<StorageReference>, val context: Context, private val listener : CustomItemClickListener) : RecyclerView.Adapter<ReferenceViewRecyclerViewAdapterViewHolder>() {
+
+
     override fun getItemCount(): Int {
         return items.size
     }
 
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): ReferenceViewRecyclerViewAdapterViewHolder {
-        return ReferenceViewRecyclerViewAdapterViewHolder(LayoutInflater.from(context).inflate(R.layout.reference_view, p0, false))
+        val mView = LayoutInflater.from(context).inflate(R.layout.reference_view, p0, false)
+
+        return ReferenceViewRecyclerViewAdapterViewHolder(mView)
     }
 
     override fun onBindViewHolder(holder: ReferenceViewRecyclerViewAdapterViewHolder, position: Int) {
-        GlideApp.with(this.context).load(items[position]).into(holder.referenceImage)
+        GlideApp.with(context).load(items[position]).into(holder.referenceImage)
 
         holder.referenceImageCardView.setOnClickListener {
-            EditCosplay().zoomInCosplayContainer(items[position].path)
+            //zoomInCosplayContainer(it, items[position].path)
+            listener.onItemClick(it, position, items[position].path)
         }
     }
 

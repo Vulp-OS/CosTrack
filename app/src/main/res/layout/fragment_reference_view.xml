@@ -9,7 +9,8 @@
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/refreshContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:visibility="visible">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/imageContainer"
@@ -18,7 +19,6 @@
             app:layoutManager="android.support.v7.widget.GridLayoutManager"
             app:spanCount="2"
             android:adjustViewBounds="true"
-
             android:orientation="vertical">
 
         </android.support.v7.widget.RecyclerView>
@@ -32,6 +32,13 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         android:tint="@android:color/white"
+        android:visibility="visible"
         app:srcCompat="@android:drawable/ic_input_add" />
+
+    <com.github.chrisbanes.photoview.PhotoView
+        android:id="@+id/ReferencePhotoContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
 
 </FrameLayout>

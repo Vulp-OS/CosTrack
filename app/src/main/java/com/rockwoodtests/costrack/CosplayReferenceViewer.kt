@@ -27,13 +27,12 @@ class CosplayReferenceViewer : AppCompatActivity() {
     }
 
     private fun loadImageIntoView() {
-        GlideApp.with(this).load(imagePath).into(CosplayReferencePhotoContainer)
+        val imageRef = storage.getReference(imagePath!!)
+
+        GlideApp.with(this).load(imageRef).into(CosplayReferencePhotoContainer)
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
-        val returnIntent = intent
-        setResult(Activity.RESULT_OK, returnIntent)
         finish()
     }
 

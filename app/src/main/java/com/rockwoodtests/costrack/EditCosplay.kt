@@ -215,6 +215,7 @@ class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionList
 
     fun zoomInCosplayContainer(imagePath: String) {
         Log.d(TAG, "Before creating Intent")
+        Log.d(TAG, "This: ${this.id}")
         val intent = Intent(this, CosplayReferenceViewer::class.java)
         Log.d(TAG, "After creating Intent")
         intent.putExtra("imagePath", imagePath)

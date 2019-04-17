@@ -37,14 +37,6 @@ class ComponentView : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            cosplayID = it.getString(ARG_PARAM1)
-            Log.d(TAG, "CosplayID: $cosplayID")
-        }
-
-        arguments?.keySet()?.forEach {
-            Log.d(TAG, "Argument KeySet: $it")
-        }
     }
 
     override fun onCreateView(
@@ -57,6 +49,15 @@ class ComponentView : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+
+        arguments?.let {
+            cosplayID = it.getString(ARG_PARAM1)
+            Log.d(TAG, "CosplayID: $cosplayID")
+        }
+
+        arguments?.keySet()?.forEach {
+            Log.d(TAG, "Argument KeySet: $it")
+        }
 
         if((0..10).random() >= 6)
             showAd()

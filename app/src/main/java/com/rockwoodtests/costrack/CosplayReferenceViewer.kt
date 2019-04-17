@@ -3,6 +3,7 @@ package com.rockwoodtests.costrack
 import android.app.Activity
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.MenuItem
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_cosplay_reference_viewer.*
@@ -32,8 +33,13 @@ class CosplayReferenceViewer : AppCompatActivity() {
         GlideApp.with(this).load(imageRef).into(CosplayReferencePhotoContainer)
     }
 
-    override fun onBackPressed() {
-        finish()
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if (item?.itemId == android.R.id.home) {
+            onBackPressed()
+            return true
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
 }

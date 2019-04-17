@@ -6,9 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -39,10 +37,6 @@ class ReferenceView : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            id = it.getString(ARG_PARAM1)
-            type = it.getInt(ARG_PARAM2)
-        }
     }
 
     override fun onCreateView(
@@ -55,6 +49,11 @@ class ReferenceView : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+
+        arguments?.let {
+            id = it.getString(ARG_PARAM1)
+            type = it.getInt(ARG_PARAM2)
+        }
 
         Log.d(TAG, "Provided ID is: $id")
         Log.d(TAG, "Provided Type is: $type")
@@ -72,13 +71,36 @@ class ReferenceView : Fragment() {
             refreshContainer.isRefreshing = false
         }
 
+        registerForContextMenu(imageContainer)
         loadReferences()
+    }
+
+    override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
+        super.onCreateContextMenu(menu, v, menuInfo)
+        val inflater : MenuInflater = this.activity!!.menuInflater
+        inflater.inflate(R.menu.menu_reference_context, menu)
+    }
+
+    override fun onContextItemSelected(item: MenuItem?): Boolean {
+        Log.d(TAG, "Menu Item Info: " + item?.menuInfo.toString())
+
+        return when (item?.itemId) {
+            R.id.action_delete -> {
+                deleteReference()
+                true
+            }
+            else -> super.onContextItemSelected(item)
+        }
     }
 
 //    // TODO: Rename method, update argument and hook method into UI event
 //    fun onButtonPressed(uri: Uri) {
 //        listener?.onFragmentInteraction(uri)
 //    }
+
+    private fun deleteReference() {
+        Log.d(TAG, "Deleting Reference")
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

@@ -35,10 +35,4 @@
         android:visibility="visible"
         app:srcCompat="@android:drawable/ic_input_add" />
 
-    <com.github.chrisbanes.photoview.PhotoView
-        android:id="@+id/ReferencePhotoContainer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"/>
-
 </FrameLayout>

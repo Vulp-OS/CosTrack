@@ -52,5 +52,6 @@
     <string name="component_type">Component Type</string>
     <string name="title_activity_image_viewer">ImageViewer</string>
     <string name="title_activity_cosplay_reference_viewer">CosplayReferenceViewer</string>
+    <string name="action_delete">Delete</string>
 
 </resources>

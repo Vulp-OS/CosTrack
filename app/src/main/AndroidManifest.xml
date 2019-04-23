@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".CosplayReferenceViewer"
+            android:name=".PhotoReferenceViewer"
             android:label="@string/title_activity_cosplay_reference_viewer"
             android:parentActivityName=".EditCosplay"
             android:theme="@style/AppTheme.NoActionBar">

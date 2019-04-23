@@ -29,7 +29,7 @@ import java.util.*
 
 private const val NUM_PAGES = 2
 
-class EditComponent: AppCompatActivity(), ReferenceView.OnFragmentInteractionListener, ComponentToolView.OnFragmentInteractionListener, StatView.OnFragmentInteractionListener{
+class EditComponent: AppCompatActivity(), ReferenceView.OnFragmentInteractionListener, ComponentToolView.OnFragmentInteractionListener {
     private var user = FirebaseAuth.getInstance().currentUser!!
     private var db = FirebaseFirestore.getInstance()
     private var storage = FirebaseStorage.getInstance()
@@ -140,17 +140,21 @@ class EditComponent: AppCompatActivity(), ReferenceView.OnFragmentInteractionLis
 
     fun startTimer(v: View) {
         startTime = SystemClock.uptimeMillis()
-        handler.postDelayed(runnable, 1000)
+        handler.postDelayed(timerRunnable, 1000)
+        btnStartTimer.isEnabled = false
         btnFinishTimer.isEnabled = false
+        btnPauseTimer.isEnabled = true
     }
 
     fun pauseTimer(v: View) {
         timeBuff += millisecondTime
-        handler.removeCallbacks(runnable)
+        handler.removeCallbacks(timerRunnable)
+        btnStartTimer.isEnabled = true
         btnFinishTimer.isEnabled = true
+        btnPauseTimer.isEnabled = false
     }
 
-    private val runnable = object: Runnable {
+    private val timerRunnable = object: Runnable {
         override fun run() {
             millisecondTime = SystemClock.uptimeMillis() - startTime
             totalTime = timeBuff + millisecondTime

@@ -9,7 +9,7 @@ import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_cosplay_reference_viewer.*
 import kotlinx.android.synthetic.main.content_cosplay_reference_viewer.*
 
-class CosplayReferenceViewer : AppCompatActivity() {
+class PhotoReferenceViewer : AppCompatActivity() {
     private var imagePath: String? = null
 
     private var db = FirebaseFirestore.getInstance()

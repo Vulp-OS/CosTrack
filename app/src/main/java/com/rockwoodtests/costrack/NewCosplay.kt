@@ -47,30 +47,31 @@ class NewCosplay : AppCompatActivity() {
                 cosplayData["budget"] = Integer.parseInt(inputCosplayBudget.text.toString())
                 cosplayData["money_spent"] = 0
                 cosplayData["cover_image"] = "gs://costrack.appspot.com/defaults/new-cosplay.png"
-                cosplayData["due_date"] = Integer.parseInt(parsedDueDate.time.toString())       // Storing time in milliseconds from epoch
-                cosplayData["start_date"] = Integer.parseInt(parsedStartDate.time.toString())
+                cosplayData["due_date"] = parsedDueDate.time.toString().toLong()       // Storing time in milliseconds from epoch
+                cosplayData["start_date"] = parsedStartDate.time.toString().toLong()
                 cosplayData["components"] = ArrayList<String>()
+                cosplayData["time_logged"] = 0
+
+                // Save Parsed information into FireStore
+                try {
+                    db.collection("cosplays")
+                        .add(cosplayData)
+                        .addOnSuccessListener {
+                            Log.d(TAG, "DocumentSnapshot Written with ID: " + it.id)
+                            this.finish()
+                        }
+                        .addOnFailureListener {
+                            Log.w(TAG, "Error adding document", it)
+                        }
+                } catch (e: Exception) {
+                    Snackbar.make(v, "Could not upload data.", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show()
+                    Log.e(TAG, "Error Uploading Data: ", e)
+                }
             } catch (e: Exception) {
                 Snackbar.make(v, "Could not parse fields. Please ensure contents are accurate.", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show()
                 Log.e(TAG, "Error Parsing Data: ", e)
-            }
-
-            // Save Parsed information into FireStore
-            try {
-                db.collection("cosplays")
-                    .add(cosplayData)
-                    .addOnSuccessListener {
-                        Log.d(TAG, "DocumentSnapshot Written with ID: " + it.id)
-                        this.finish()
-                    }
-                    .addOnFailureListener {
-                        Log.w(TAG, "Error adding document", it)
-                    }
-            } catch (e: Exception) {
-                Snackbar.make(v, "Could not upload data.", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
-                Log.e(TAG, "Error Uploading Data: ", e)
             }
         }
     }

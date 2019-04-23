@@ -27,7 +27,7 @@ import java.util.*
 
 private const val NUM_PAGES = 3
 
-class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionListener, ReferenceView.OnFragmentInteractionListener, CosplayToolView.OnFragmentInteractionListener, StatView.OnFragmentInteractionListener {
+class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionListener, ReferenceView.OnFragmentInteractionListener, CosplayToolView.OnFragmentInteractionListener {
 
     private var id: String? = null
 
@@ -140,7 +140,7 @@ class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionList
 
     fun startTimer(v: View) {
         startTime = SystemClock.uptimeMillis()
-        handler.postDelayed(runnable, 1000)
+        handler.postDelayed(timerRunnable, 1000)
         btnStartTimer.isEnabled = false
         btnFinishTimer.isEnabled = false
         btnPauseTimer.isEnabled = true
@@ -148,13 +148,28 @@ class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionList
 
     fun pauseTimer(v: View) {
         timeBuff += millisecondTime
-        handler.removeCallbacks(runnable)
+        handler.removeCallbacks(timerRunnable)
         btnStartTimer.isEnabled = true
         btnFinishTimer.isEnabled = true
         btnPauseTimer.isEnabled = false
     }
 
-    private val runnable = object: Runnable {
+    fun finishTimer(v: View) {
+        // Use cosplay id $id to accumulate time to the correct location
+        val resetTime = "00:00:00"
+        val timeToStore = totalTime/1000 + dataMiscTimeSpent.text.toString().toInt()
+
+        db.collection("cosplays").document(id!!).update("time_logged", timeToStore).addOnSuccessListener {
+            dataTimeSpent.text = (dataTimeSpent.text.toString().toInt() + totalTime/1000).toString()
+            dataMiscTimeSpent.text = timeToStore.toString()
+
+            totalTime = 0
+            timeBuff = 0
+            lblTimer.text = resetTime
+        }
+    }
+
+    private val timerRunnable = object: Runnable {
         override fun run() {
             millisecondTime = SystemClock.uptimeMillis() - startTime
             totalTime = timeBuff + millisecondTime
@@ -216,7 +231,7 @@ class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionList
     fun zoomInCosplayContainer(imagePath: String) {
         Log.d(TAG, "Before creating Intent")
         Log.d(TAG, "This: ${this.id}")
-        val intent = Intent(this, CosplayReferenceViewer::class.java)
+        val intent = Intent(this, PhotoReferenceViewer::class.java)
         Log.d(TAG, "After creating Intent")
         intent.putExtra("imagePath", imagePath)
 

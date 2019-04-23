@@ -27,8 +27,6 @@ class ReferenceViewRecyclerViewAdapter(private val items : ArrayList<StorageRefe
             //zoomInCosplayContainer(it, items[position].path)
             listener.onItemClick(it, position, items[position].path)
         }
-
-        holder.referenceImageCardView.setOnCreateContextMenuListener(ReferenceViewRecyclerViewAdapterViewHolder(holder.referenceImageCardView))
     }
 
     fun clear() {
@@ -42,22 +40,8 @@ class ReferenceViewRecyclerViewAdapter(private val items : ArrayList<StorageRefe
     }
 }
 
-class ReferenceViewRecyclerViewAdapterViewHolder(view: View): RecyclerView.ViewHolder(view), View.OnCreateContextMenuListener {
+class ReferenceViewRecyclerViewAdapterViewHolder(view: View): RecyclerView.ViewHolder(view) {
     var referenceImage = view.referenceImage!!
     var referenceImageCardView = view.referenceImageCardView!!
-
-//    init {
-//        view.setOnCreateContextMenuListener(this)
-//    }
-
-    override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
-//        val inflater : MenuInflater = this.activity!!.menuInflater
-//        inflater.inflate(R.menu.menu_reference_context, menu)
-
-        menu?.getItem(this.adapterPosition)
-        menu?.setHeaderTitle("Select Action")
-
-//        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
 }
 

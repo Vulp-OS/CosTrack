@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.*
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -35,14 +36,11 @@ class ReferenceView : Fragment() {
 
     private var adapter: ReferenceViewRecyclerViewAdapter? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//    }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_reference_view, container, false)
     }
@@ -75,32 +73,10 @@ class ReferenceView : Fragment() {
         loadReferences()
     }
 
-    override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
-        super.onCreateContextMenu(menu, v, menuInfo)
-        val inflater : MenuInflater = this.activity!!.menuInflater
-        inflater.inflate(R.menu.menu_reference_context, menu)
-    }
-
-    override fun onContextItemSelected(item: MenuItem?): Boolean {
-        Log.d(TAG, "Menu Item Info: " + item?.menuInfo.toString())
-
-        return when (item?.itemId) {
-            R.id.action_delete -> {
-                deleteReference()
-                true
-            }
-            else -> super.onContextItemSelected(item)
-        }
-    }
-
 //    // TODO: Rename method, update argument and hook method into UI event
 //    fun onButtonPressed(uri: Uri) {
 //        listener?.onFragmentInteraction(uri)
 //    }
-
-    private fun deleteReference() {
-        Log.d(TAG, "Deleting Reference")
-    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -115,6 +91,7 @@ class ReferenceView : Fragment() {
         super.onDetach()
         listener = null
     }
+
     private fun refreshList() {
         when(type) {
             0 -> refreshListForCosplay()
@@ -178,35 +155,7 @@ class ReferenceView : Fragment() {
         db.collection("cosplays").document(id as String).get()
             .addOnSuccessListener { document ->
                 if (document != null) {
-                    val imageReferences = ArrayList<StorageReference>()
-
-                    if (document.data?.get("references") != null) {
-                        val referenceURLs = document.data!!["references"] as ArrayList<*>
-
-                        for (url in referenceURLs) {
-                            imageReferences.add(storage.getReferenceFromUrl(url as String))
-                        }
-                    }
-
-                    val listener = object : CustomItemClickListener {
-                        override fun onItemClick(v: View, position: Int, imagePath: String) {
-                            Log.d(TAG, "Before creating Intent")
-                            val intent = Intent(v.context, CosplayReferenceViewer::class.java)
-                            Log.d(TAG, "After creating Intent")
-                            intent.putExtra("imagePath", imagePath)
-
-                            startActivityForResult(intent, RESULT_VIEW_IMAGE)
-
-//                            refreshContainer.visibility = View.GONE
-//                            //fabUploadImage.visibility = View.GONE
-//                            ReferencePhotoContainer.visibility = View.VISIBLE
-//
-//                            GlideApp.with(v).load(imagePath).into(ReferencePhotoContainer)
-                        }
-                    }
-
-                    adapter = ReferenceViewRecyclerViewAdapter(imageReferences, this.context!!, listener)
-                    imageContainer.adapter = adapter
+                    populateReferenceImages(document)
                 } else {
                     Log.d(TAG, "Could not find specified cosplay")
                 }
@@ -217,57 +166,46 @@ class ReferenceView : Fragment() {
         db.collection("components").document(id as String).get()
             .addOnSuccessListener { document ->
                 if (document != null) {
-                    val imageReferences = ArrayList<StorageReference>()
-
-                    if (document.data?.get("references") != null) {
-
-                        val referenceURLs = document.data!!["references"] as ArrayList<*>
-
-                        for (url in referenceURLs) {
-                            imageReferences.add(storage.getReferenceFromUrl(url as String))
-                        }
-                    }
-
-                    val listener = object : CustomItemClickListener {
-                        override fun onItemClick(v: View, position: Int, imagePath: String) {
-                            Log.d(TAG, "Before creating Intent")
-                            val intent = Intent(v.context, CosplayReferenceViewer::class.java)
-                            Log.d(TAG, "After creating Intent")
-                            intent.putExtra("imagePath", imagePath)
-
-                            startActivityForResult(intent, RESULT_VIEW_IMAGE)
-                        }
-                    }
-
-                    adapter = ReferenceViewRecyclerViewAdapter(imageReferences, this.context!!, listener)
-
-                    imageContainer.adapter = adapter
+                    populateReferenceImages(document)
                 } else {
-                    Log.d(TAG, "Could not find specified cosplay")
+                    Log.d(TAG, "Could not find specified component")
                 }
             }
     }
 
-    fun zoomFromThumb(v: View, imagePath: String) {
-        zoomInCosplayContainer(v, imagePath)
+    /**
+     * Returns a CustomItemClickListener that opens the PhotoReferenceViewer when triggered
+     * @return listener
+     */
+    private fun getCustomItemClickListener(): CustomItemClickListener {
+        return object : CustomItemClickListener {
+            override fun onItemClick(v: View, position: Int, imagePath: String) {
+                val intent = Intent(v.context, PhotoReferenceViewer::class.java)
+                intent.putExtra("imagePath", imagePath)
 
-//        when(type) {
-//            0 -> zoomInCosplayContainer(imageID)
-//            1 -> zoomInComponentContainer(imageID)
-//            else -> Log.d(TAG, "Unknown type specified: $type")
-//        }
+                startActivityForResult(intent, RESULT_VIEW_IMAGE)
+            }
+        }
     }
 
-    fun zoomInCosplayContainer(v: View, imagePath: String) {
-        Log.d(TAG, "Before creating Intent")
-        Log.d(TAG, "This: ${this.id}")
-        val intent = Intent(v.context, CosplayReferenceViewer::class.java)
-        Log.d(TAG, "After creating Intent")
-        intent.putExtra("imagePath", imagePath)
+    private fun populateReferenceImages(document: DocumentSnapshot) {
+        val imageReferences = ArrayList<StorageReference>()
 
-        startActivityForResult(intent, RESULT_VIEW_IMAGE)
+        if (document.data?.get("references") != null) {
+
+            val referenceURLs = document.data!!["references"] as ArrayList<*>
+
+            for (url in referenceURLs) {
+                imageReferences.add(storage.getReferenceFromUrl(url as String))
+            }
+        }
+
+        val listener = getCustomItemClickListener()
+
+        adapter = ReferenceViewRecyclerViewAdapter(imageReferences, this.context!!, listener)
+
+        imageContainer.adapter = adapter
     }
-
 
     /**
      * This interface must be implemented by activities that contain this
@@ -290,17 +228,17 @@ class ReferenceView : Fragment() {
          * Use this factory method to create a new instance of
          * this fragment using the provided parameters.
          *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
+         * @param id Parameter 1.
+         * @param type Parameter 2.
          * @return A new instance of fragment ReferenceView.
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance(id: String, type: Int) =
             ReferenceView().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+                    putString(ARG_PARAM1, id)
+                    putInt(ARG_PARAM2, type)
                 }
             }
         private const val TAG = "ReferenceView"

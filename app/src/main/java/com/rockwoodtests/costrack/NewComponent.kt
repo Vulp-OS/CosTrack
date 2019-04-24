@@ -1,5 +1,6 @@
 package com.rockwoodtests.costrack
 
+import android.app.Activity
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
@@ -82,6 +83,7 @@ class NewComponent : AppCompatActivity() {
                                 }
                             }
 
+                        setResult(Activity.RESULT_OK)
                         this.finish()
                     }
                     .addOnFailureListener {

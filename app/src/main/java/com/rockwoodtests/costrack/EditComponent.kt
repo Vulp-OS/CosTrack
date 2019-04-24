@@ -20,7 +20,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
-//import android.view.View
 import kotlinx.android.synthetic.main.activity_edit_component.*
 import kotlinx.android.synthetic.main.content_edit_component.*
 import kotlinx.android.synthetic.main.fragment_component_tool_view.*
@@ -97,12 +96,6 @@ class EditComponent: AppCompatActivity(), ReferenceView.OnFragmentInteractionLis
         return true
     }
 
-//    fun uploadNewReference(v: View) {
-//        val intent = Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-//
-//        startActivityForResult(intent, RESULT_LOAD_IMAGE)
-//    }
-
     private fun uploadImage(uri: Uri) {
         val uuid = UUID.randomUUID()
         val path = user.uid + "/" + cosplayID + "/" + componentID + "/" + uuid
@@ -116,6 +109,7 @@ class EditComponent: AppCompatActivity(), ReferenceView.OnFragmentInteractionLis
                     .addOnSuccessListener {
                         Snackbar.make(fabUploadImage, "Image Successfully Uploaded", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show()
+                        pagerManager.adapter!!.notifyDataSetChanged()
                     }
             }
         }
@@ -154,6 +148,26 @@ class EditComponent: AppCompatActivity(), ReferenceView.OnFragmentInteractionLis
         btnPauseTimer.isEnabled = false
     }
 
+    fun finishTimer(v: View) {
+        // Use cosplay id $id to accumulate time to the correct location
+        val resetTime = "00:00:00"
+        val timeToStore = totalTime/1000 + dataTimeSpent.text.toString().toInt()
+
+        db.collection("components").document(componentID!!).update("time_logged", timeToStore).addOnSuccessListener {
+            dataTimeSpent.text = timeToStore.toString()
+
+            totalTime = 0
+            timeBuff = 0
+            lblTimer.text = resetTime
+        }
+    }
+
+    fun deleteComponent(v: View) {
+        DataDeleter().deleteComponent(componentID!!, cosplayID!!)
+        setResult(RESULT_COMPONENT_DELETED)
+        finish()
+    }
+
     private val timerRunnable = object: Runnable {
         override fun run() {
             millisecondTime = SystemClock.uptimeMillis() - startTime
@@ -190,6 +204,10 @@ class EditComponent: AppCompatActivity(), ReferenceView.OnFragmentInteractionLis
             }
             return ReferenceView()
         }
+
+        override fun getItemPosition(`object`: Any): Int {
+            return POSITION_NONE
+        }
     }
 
     private inner class ScreenSlidePageChangeListener(bottomNavigationView: BottomNavigationView) : ViewPager.OnPageChangeListener {
@@ -209,5 +227,6 @@ class EditComponent: AppCompatActivity(), ReferenceView.OnFragmentInteractionLis
     companion object {
         private const val TAG = "EditComponent"
         private const val RESULT_LOAD_IMAGE = 1
+        private const val RESULT_COMPONENT_DELETED = 998
     }
 }

@@ -104,7 +104,7 @@ class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionList
         val intent = Intent(this, NewComponent::class.java)
         intent.putExtra("id", id)
 
-        startActivity(intent)
+        startActivityForResult(intent, RESULT_NEW_COMPONENT)
     }
 
     private fun uploadImage(uri: Uri) {
@@ -120,6 +120,7 @@ class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionList
                     .addOnSuccessListener {
                         Snackbar.make(fabUploadImage, "Image Successfully Uploaded", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show()
+                        pagerManager.adapter!!.notifyDataSetChanged()
                     }
             }
         }
@@ -128,13 +129,14 @@ class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionList
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
+        Log.d(TAG, "onActivityResult info:\n\tRequestCode: $requestCode\n\tresultCode: $resultCode\n\tdata: $data")
+
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == Activity.RESULT_OK && data != null) {
             if (data.data != null) {
                 uploadImage(data.data!!)
             }
-        } else if (requestCode == RESULT_VIEW_IMAGE && resultCode == Activity.RESULT_OK) {
-            Snackbar.make(imageContainer, "Image Viewed", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+        } else if (requestCode == RESULT_NEW_COMPONENT && resultCode == Activity.RESULT_OK) {
+            pagerManager.adapter!!.notifyDataSetChanged()
         }
     }
 
@@ -167,6 +169,12 @@ class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionList
             timeBuff = 0
             lblTimer.text = resetTime
         }
+    }
+
+    fun deleteCosplay(v: View) {
+        DataDeleter().deleteCosplay(id!!)
+        setResult(RESULT_COSPLAY_DELETED)
+        finish()
     }
 
     private val timerRunnable = object: Runnable {
@@ -212,6 +220,10 @@ class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionList
 
             return cv
         }
+
+        override fun getItemPosition(`object`: Any): Int {
+            return POSITION_NONE
+        }
     }
 
     private inner class ScreenSlidePageChangeListener(bottomNavigationView: BottomNavigationView) : ViewPager.OnPageChangeListener {
@@ -228,19 +240,10 @@ class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionList
         }
     }
 
-    fun zoomInCosplayContainer(imagePath: String) {
-        Log.d(TAG, "Before creating Intent")
-        Log.d(TAG, "This: ${this.id}")
-        val intent = Intent(this, PhotoReferenceViewer::class.java)
-        Log.d(TAG, "After creating Intent")
-        intent.putExtra("imagePath", imagePath)
-
-        startActivityForResult(intent, RESULT_VIEW_IMAGE)
-    }
-
     companion object {
         private const val TAG = "EditCosplay"
         private const val RESULT_LOAD_IMAGE = 1
-        private const val RESULT_VIEW_IMAGE = 2
+        private const val RESULT_NEW_COMPONENT = 2
+        private const val RESULT_COSPLAY_DELETED = 997
     }
 }

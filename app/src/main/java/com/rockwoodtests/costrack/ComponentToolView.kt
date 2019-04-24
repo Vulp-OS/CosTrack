@@ -31,14 +31,14 @@ class ComponentToolView : Fragment() {
     private var db = FirebaseFirestore.getInstance()
 
     private var id: String? = null
-    private var type: String? = null
+    private var type: Int? = null
     private var listener: OnFragmentInteractionListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             id = it.getString(ARG_PARAM1)
-            type = it.getString(ARG_PARAM2)
+            type = it.getInt(ARG_PARAM2)
         }
     }
 
@@ -66,7 +66,6 @@ class ComponentToolView : Fragment() {
                 dataComponentType.text = componentDocument.data!!["type"] as String
                 dataMoneySpent.text = (componentDocument.data!!["money_spent"] as Long).toString()
                 dataTimeSpent.text = (componentDocument.data!!["time_logged"] as Long).toString()
-                //TODO: Fill Start/Due Date
             }
         }
     }
@@ -81,7 +80,7 @@ class ComponentToolView : Fragment() {
         if (context is OnFragmentInteractionListener) {
             listener = context
         } else {
-            throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
+            throw RuntimeException("$context must implement OnFragmentInteractionListener")
         }
     }
 

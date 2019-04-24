@@ -10,6 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.fragment_cosplay_tool_view.*
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -88,13 +91,16 @@ class CosplayToolView : Fragment() {
                         }
                 }
 
-                //TODO: Fill Start/Due data later
+                // Declare the desired format for dates and convert milliTime to a Date string
+                val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH)
+
+                val dueDate = cosplayDocument.data!!["due_date"] as Long
+                dataDueDate.text = formatter.format(Date(dueDate))
+
+                val startDate = cosplayDocument.data!!["start_date"] as Long
+                dataStartDate.text = formatter.format(Date(startDate))
             }
         }
-    }
-
-    fun saveTimeSpent(time: Long) {
-
     }
 
     // TODO: Rename method, update argument and hook method into UI event

@@ -20,6 +20,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_cosplay_reference_viewer" />
+    <include layout="@layout/content_photo_reference_viewer" />
 
 </android.support.design.widget.CoordinatorLayout>

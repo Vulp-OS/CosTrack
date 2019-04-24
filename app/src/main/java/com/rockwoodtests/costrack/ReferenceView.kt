@@ -1,16 +1,16 @@
 package com.rockwoodtests.costrack
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.*
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.fragment_reference_view.*
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -28,7 +28,6 @@ private const val ARG_PARAM2 = "type"
  */
 class ReferenceView : Fragment() {
     private var db = FirebaseFirestore.getInstance()
-    private var storage = FirebaseStorage.getInstance()
 
     private var id: String? = null
     private var type: Int? = null
@@ -73,6 +72,17 @@ class ReferenceView : Fragment() {
         loadReferences()
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == RESULT_VIEW_IMAGE && resultCode == RESULT_DELETED) {
+            Snackbar.make(fabUploadImage, "Image Successfully Deleted", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show()
+
+            refreshList()
+        }
+    }
+
 //    // TODO: Rename method, update argument and hook method into UI event
 //    fun onButtonPressed(uri: Uri) {
 //        listener?.onFragmentInteraction(uri)
@@ -104,16 +114,17 @@ class ReferenceView : Fragment() {
         db.collection("cosplays").document(id as String).get()
             .addOnSuccessListener { document ->
                 if (document != null) {
-                    val imageReferences = ArrayList<StorageReference>()
+                    val imageReferences = ArrayList<String>()
 
                     if (document.data?.get("references") != null) {
                         val referenceURLs = document.data!!["references"] as ArrayList<*>
 
                         for (url in referenceURLs) {
-                            imageReferences.add(storage.getReferenceFromUrl(url as String))
+                            imageReferences.add(url as String)
                         }
                     }
 
+                    adapter!!.clear()
                     adapter!!.addAll(imageReferences)
                 } else {
                     Log.d(TAG, "Could not find specified cosplay")
@@ -125,17 +136,18 @@ class ReferenceView : Fragment() {
         db.collection("components").document(id as String).get()
             .addOnSuccessListener { document ->
                 if (document != null) {
-                    val imageReferences = ArrayList<StorageReference>()
+                    val imageReferences = ArrayList<String>()
 
                     if (document.data?.get("references") != null) {
 
                         val referenceURLs = document.data!!["references"] as ArrayList<*>
 
                         for (url in referenceURLs) {
-                            imageReferences.add(storage.getReferenceFromUrl(url as String))
+                            imageReferences.add(url as String)
                         }
                     }
 
+                    adapter!!.clear()
                     adapter!!.addAll(imageReferences)
                 } else {
                     Log.d(TAG, "Could not find specified cosplay")
@@ -182,6 +194,8 @@ class ReferenceView : Fragment() {
             override fun onItemClick(v: View, position: Int, imagePath: String) {
                 val intent = Intent(v.context, PhotoReferenceViewer::class.java)
                 intent.putExtra("imagePath", imagePath)
+                intent.putExtra("parentID", id)
+                intent.putExtra("parentType", type)
 
                 startActivityForResult(intent, RESULT_VIEW_IMAGE)
             }
@@ -189,14 +203,14 @@ class ReferenceView : Fragment() {
     }
 
     private fun populateReferenceImages(document: DocumentSnapshot) {
-        val imageReferences = ArrayList<StorageReference>()
+        val imageReferences = ArrayList<String>()
 
         if (document.data?.get("references") != null) {
 
             val referenceURLs = document.data!!["references"] as ArrayList<*>
 
             for (url in referenceURLs) {
-                imageReferences.add(storage.getReferenceFromUrl(url as String))
+                imageReferences.add(url as String)
             }
         }
 
@@ -244,5 +258,6 @@ class ReferenceView : Fragment() {
         private const val TAG = "ReferenceView"
         private const val RESULT_LOAD_IMAGE=1
         private const val RESULT_VIEW_IMAGE = 2
+        private const val RESULT_DELETED = 999
     }
 }

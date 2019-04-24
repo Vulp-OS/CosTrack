@@ -4,11 +4,11 @@ import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.*
 import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.reference_view.view.*
-import kotlin.properties.Delegates
 
-class ReferenceViewRecyclerViewAdapter(private val items : ArrayList<StorageReference>, val context: Context, private val listener : CustomItemClickListener) : RecyclerView.Adapter<ReferenceViewRecyclerViewAdapterViewHolder>() {
-
+class ReferenceViewRecyclerViewAdapter(private val items : ArrayList<String>, val context: Context, private val listener : CustomItemClickListener) : RecyclerView.Adapter<ReferenceViewRecyclerViewAdapterViewHolder>() {
+    val storage = FirebaseStorage.getInstance()
 
     override fun getItemCount(): Int {
         return items.size
@@ -21,11 +21,11 @@ class ReferenceViewRecyclerViewAdapter(private val items : ArrayList<StorageRefe
     }
 
     override fun onBindViewHolder(holder: ReferenceViewRecyclerViewAdapterViewHolder, position: Int) {
-        GlideApp.with(context).load(items[position]).into(holder.referenceImage)
+        GlideApp.with(context).load(storage.getReferenceFromUrl(items[position])).into(holder.referenceImage)
 
         holder.referenceImageCardView.setOnClickListener {
             //zoomInCosplayContainer(it, items[position].path)
-            listener.onItemClick(it, position, items[position].path)
+            listener.onItemClick(it, position, items[position])
         }
     }
 
@@ -34,7 +34,7 @@ class ReferenceViewRecyclerViewAdapter(private val items : ArrayList<StorageRefe
         notifyDataSetChanged()
     }
 
-    fun addAll(list: ArrayList<StorageReference>) {
+    fun addAll(list: ArrayList<String>) {
         items.addAll(list)
         notifyDataSetChanged()
     }

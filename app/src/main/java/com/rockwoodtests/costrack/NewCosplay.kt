@@ -43,6 +43,7 @@ class NewCosplay : AppCompatActivity() {
                 val parsedDueDate = SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH).parse(lblCosplayDueDate.text.toString())
 
                 cosplayData["name"] = inputCosplayName.text.toString()
+                cosplayData["series"] = inputCosplaySeries.text.toString()
                 cosplayData["owner"] = user.uid
                 cosplayData["budget"] = Integer.parseInt(inputCosplayBudget.text.toString())
                 cosplayData["money_spent"] = 0

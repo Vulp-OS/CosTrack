@@ -1,6 +1,8 @@
 package com.rockwoodtests.costrack
 
 import android.app.Activity
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -16,6 +18,7 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.EditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -96,7 +99,7 @@ class EditComponent: AppCompatActivity(), ReferenceView.OnFragmentInteractionLis
         return true
     }
 
-    private fun uploadImage(uri: Uri) {
+    private fun uploadReferenceImage(uri: Uri) {
         val uuid = UUID.randomUUID()
         val path = user.uid + "/" + cosplayID + "/" + componentID + "/" + uuid
 
@@ -115,12 +118,65 @@ class EditComponent: AppCompatActivity(), ReferenceView.OnFragmentInteractionLis
         }
     }
 
+    private fun uploadCoverImage(uri: Uri) {
+        val uuid = UUID.randomUUID()
+        val path = user.uid + "/" + cosplayID + "/" + componentID + "/" + uuid
+
+        val imageRef = storage.reference.child(path)
+
+        // Upload new cover image. Don't perform any additional tasks if upload does not succeed.
+        imageRef.putFile(uri).addOnSuccessListener {
+            imageRef.downloadUrl.addOnSuccessListener {newRef ->
+
+                //Delete old cover image if it isn't the default image and change URL to new cover image
+                db.collection("components").document(componentID as String)
+                    .get()
+                    .addOnSuccessListener { document ->
+                        if (document != null) {
+                            val oldCoverImageURL = document.data!!["cover_image"] as String
+                            val oldRef = storage.getReferenceFromUrl(oldCoverImageURL)
+                            if (!oldRef.path.contains("defaults")) {
+                                // Delete the image. Don't change image URL if delete fails
+                                oldRef.delete().addOnSuccessListener {
+                                    db.collection("components").document(componentID as String)
+                                        .update("cover_image", newRef.toString())
+                                        .addOnSuccessListener {
+                                            Snackbar.make(btnChangeCoverImage, "Cover Image Successfully Changed", Snackbar.LENGTH_LONG)
+                                                .setAction("Action", null).show()
+                                            pagerManager.adapter!!.notifyDataSetChanged()
+                                        }
+                                }
+                                    // Delete new image if old image deletion fails
+                                    .addOnFailureListener {
+                                        imageRef.delete()
+                                    }
+                            } else {
+                                db.collection("components").document(componentID as String)
+                                    .update("cover_image", newRef.toString())
+                                    .addOnSuccessListener {
+                                        Snackbar.make(btnChangeCoverImage, "Cover Image Successfully Changed", Snackbar.LENGTH_LONG)
+                                            .setAction("Action", null).show()
+                                        pagerManager.adapter!!.notifyDataSetChanged()
+                                    }
+                            }
+                        }
+                    }
+            }
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == RESULT_LOAD_IMAGE && resultCode == Activity.RESULT_OK && data != null) {
+        if (requestCode == RESULT_LOAD_REFERENCE_IMAGE && resultCode == Activity.RESULT_OK && data != null) {
             if (data.data != null) {
-                uploadImage(data.data!!)
+                uploadReferenceImage(data.data!!)
+            }
+        }
+
+        if (requestCode == RESULT_LOAD_COVER_IMAGE && resultCode == Activity.RESULT_OK && data != null) {
+            if (data.data != null) {
+                uploadCoverImage(data.data!!)
             }
         }
     }
@@ -160,6 +216,23 @@ class EditComponent: AppCompatActivity(), ReferenceView.OnFragmentInteractionLis
             timeBuff = 0
             lblTimer.text = resetTime
         }
+    }
+
+    fun renameComponent(v: View) {
+        val inputNewName = EditText(v.context)
+
+        val dialog = AlertDialog.Builder(v.context)
+            .setTitle("Rename Component")
+            .setMessage("Enter new component name.")
+            .setView(inputNewName)
+            .setPositiveButton("Rename", DialogInterface.OnClickListener { dialog, which ->
+                db.collection("components").document(componentID!!).update("name", inputNewName.text.toString())
+                dataComponentName.text = inputNewName.text
+            })
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        dialog.show()
     }
 
     fun deleteComponent(v: View) {
@@ -226,7 +299,8 @@ class EditComponent: AppCompatActivity(), ReferenceView.OnFragmentInteractionLis
 
     companion object {
         private const val TAG = "EditComponent"
-        private const val RESULT_LOAD_IMAGE = 1
+        private const val RESULT_LOAD_REFERENCE_IMAGE = 1
+        private const val RESULT_LOAD_COVER_IMAGE = 3
         private const val RESULT_COMPONENT_DELETED = 998
     }
 }

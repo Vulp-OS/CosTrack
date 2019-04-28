@@ -1,8 +1,10 @@
 package com.rockwoodtests.costrack
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
@@ -57,6 +59,12 @@ class CosplayToolView : Fragment() {
 
         Log.d(TAG, "Provided ID is: $id")
         Log.d(TAG, "Provided Type is: $type")
+
+        btnChangeCoverImage.setOnClickListener {
+            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+
+            activity?.startActivityForResult(intent, RESULT_LOAD_COVER_IMAGE)
+        }
 
         loadCosplayInfo()
     }
@@ -157,5 +165,6 @@ class CosplayToolView : Fragment() {
                 }
             }
         private const val TAG = "CosplayToolView"
+        private const val RESULT_LOAD_COVER_IMAGE = 3
     }
 }

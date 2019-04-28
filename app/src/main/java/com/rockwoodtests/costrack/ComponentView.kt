@@ -99,11 +99,11 @@ class ComponentView : Fragment() {
                                             layoutInflater.inflate(R.layout.component_view, cosplayContainer, false)
                                         inflatedLayout.componentCardView.tag = componentDocument.id
 
-                                        inflatedLayout.textView1.text = componentDocument.data!!["name"] as String
+                                        inflatedLayout.componentCoverImageText.text = componentDocument.data!!["name"] as String
 
                                         val coverImageRef =
                                             storage.getReferenceFromUrl(componentDocument.data!!["cover_image"] as String)
-                                        GlideApp.with(this).load(coverImageRef).into(inflatedLayout.imageView1)
+                                        GlideApp.with(this).load(coverImageRef).into(inflatedLayout.componentCoverImage)
 
                                         cosplayContainer.addView(inflatedLayout)
 

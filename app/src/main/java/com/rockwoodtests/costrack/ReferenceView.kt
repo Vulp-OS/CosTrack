@@ -1,6 +1,5 @@
 package com.rockwoodtests.costrack
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -58,7 +57,7 @@ class ReferenceView : Fragment() {
         fabUploadImage.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
 
-            activity?.startActivityForResult(intent, RESULT_LOAD_IMAGE)
+            activity?.startActivityForResult(intent, RESULT_LOAD_REFERENCE_IMAGE)
         }
 
         refreshContainer.setOnRefreshListener {
@@ -256,7 +255,7 @@ class ReferenceView : Fragment() {
                 }
             }
         private const val TAG = "ReferenceView"
-        private const val RESULT_LOAD_IMAGE=1
+        private const val RESULT_LOAD_REFERENCE_IMAGE=1
         private const val RESULT_VIEW_IMAGE = 2
         private const val RESULT_DELETED = 999
     }

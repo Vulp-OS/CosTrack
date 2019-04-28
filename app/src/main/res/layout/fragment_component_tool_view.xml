@@ -201,7 +201,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <Button
-                android:id="@+id/btnChangeCosplayName"
+                android:id="@+id/btnChangeComponentName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -210,7 +210,8 @@
                 android:text="@string/change_component_name"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/lblMiscContainer" />
+                app:layout_constraintTop_toBottomOf="@id/lblMiscContainer"
+                android:onClick="renameComponent"/>
 
             <Button
                 android:id="@+id/btnChangeCoverImage"
@@ -222,7 +223,7 @@
                 android:text="@string/change_cover_image"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/btnChangeCosplayName" />
+                app:layout_constraintTop_toBottomOf="@id/btnChangeComponentName" />
 
         </android.support.constraint.ConstraintLayout>
 

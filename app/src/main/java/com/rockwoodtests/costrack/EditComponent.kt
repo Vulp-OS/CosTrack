@@ -177,15 +177,9 @@ class EditComponent: AppCompatActivity(), ReferenceView.OnFragmentInteractionLis
         if (requestCode == RESULT_LOAD_COVER_IMAGE && resultCode == Activity.RESULT_OK && data != null) {
             if (data.data != null) {
                 uploadCoverImage(data.data!!)
+                setResult(RESULT_COVER_IMAGE_CHANGED)
             }
         }
-    }
-
-    override fun onBackPressed() {          // override the default behavior of pressing back, as the suspended view will not re-start with the proper arguments normally
-        val intent = Intent(this, EditCosplay::class.java)
-        intent.putExtra("id", cosplayID)
-        startActivity(intent)
-        finish()
     }
 
     fun startTimer(v: View) {
@@ -236,9 +230,9 @@ class EditComponent: AppCompatActivity(), ReferenceView.OnFragmentInteractionLis
     }
 
     fun deleteComponent(v: View) {
-        DataDeleter().deleteComponent(componentID!!, cosplayID!!)
+        val result = DataDeleter().deleteComponent(componentID!!, cosplayID!!)
         setResult(RESULT_COMPONENT_DELETED)
-        finish()
+        this.finish()
     }
 
     private val timerRunnable = object: Runnable {
@@ -301,6 +295,7 @@ class EditComponent: AppCompatActivity(), ReferenceView.OnFragmentInteractionLis
         private const val TAG = "EditComponent"
         private const val RESULT_LOAD_REFERENCE_IMAGE = 1
         private const val RESULT_LOAD_COVER_IMAGE = 3
+        private const val RESULT_COVER_IMAGE_CHANGED = 996
         private const val RESULT_COMPONENT_DELETED = 998
     }
 }

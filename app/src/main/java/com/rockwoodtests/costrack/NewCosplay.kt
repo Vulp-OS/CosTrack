@@ -1,5 +1,6 @@
 package com.rockwoodtests.costrack
 
+import android.app.Activity
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.support.design.widget.Snackbar
@@ -51,6 +52,7 @@ class NewCosplay : AppCompatActivity() {
                 cosplayData["due_date"] = parsedDueDate.time.toString().toLong()       // Storing time in milliseconds from epoch
                 cosplayData["start_date"] = parsedStartDate.time.toString().toLong()
                 cosplayData["components"] = ArrayList<String>()
+                cosplayData["references"] = ArrayList<String>()
                 cosplayData["time_logged"] = 0
 
                 // Save Parsed information into FireStore
@@ -59,6 +61,7 @@ class NewCosplay : AppCompatActivity() {
                         .add(cosplayData)
                         .addOnSuccessListener {
                             Log.d(TAG, "DocumentSnapshot Written with ID: " + it.id)
+                            setResult(Activity.RESULT_OK)
                             this.finish()
                         }
                         .addOnFailureListener {

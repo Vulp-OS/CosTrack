@@ -81,10 +81,10 @@ class NewComponent : AppCompatActivity() {
                                         db.collection("cosplays").document(id as String).set(cosplayDataPayload, SetOptions.merge())
                                     }
                                 }
-                            }
 
-                        setResult(Activity.RESULT_OK)
-                        this.finish()
+                                setResult(Activity.RESULT_OK)
+                                this.finish()
+                            }
                     }
                     .addOnFailureListener {
                         Log.w(TAG, "Error adding document", it)

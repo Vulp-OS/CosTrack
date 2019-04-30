@@ -35,15 +35,17 @@ class DataDeleter {
 
         if (parentType == 0) {
             collectionName = "cosplays"
-            defaultImageURL = "https://firebasestorage.googleapis.com/v0/b/costrack.appspot.com/o/defaults%2Fnew-cosplay.png?alt=media&token=8bcf7371-7e6d-476a-b33a-9e7e3afce1c8"
+            defaultImageURL = "gs://costrack.appspot.com/defaults/new-cosplay.png"
         } else if (parentType == 1) {
             collectionName = "components"
-            defaultImageURL = "https://firebasestorage.googleapis.com/v0/b/costrack.appspot.com/o/defaults%2Fnew-component.png?alt=media&token=16721b21-7d3e-4326-bb38-20e0aeccf101"
+            defaultImageURL = "gs://costrack.appspot.com/defaults/new-component.png"
         }
 
         try {
-            db.collection(collectionName).document(parentID).update("cover_image", defaultImageURL)
-            storage.getReferenceFromUrl(imagePath).delete()
+            if (imagePath != defaultImageURL) {
+                db.collection(collectionName).document(parentID).update("cover_image", defaultImageURL)
+                storage.getReferenceFromUrl(imagePath).delete()
+            }
         } catch (e: Exception) {
             successful = false
         }
@@ -55,7 +57,7 @@ class DataDeleter {
         var successful = true
 
         try {
-            db.collection("components").document(componentID).get().addOnSuccessListener {
+            val deletionProcess = db.collection("components").document(componentID).get().addOnSuccessListener {
                 if (it != null && it.data != null) {
                     val references = it.data!!["references"] as ArrayList<*>
 
@@ -66,9 +68,11 @@ class DataDeleter {
                     deleteCoverImage(it.data!!["cover_image"] as String, 1, componentID)
 
                     db.collection("cosplays").document(cosplayID).update("components", FieldValue.arrayRemove(componentID))
-                    db.collection("components").document(componentID).delete()
+                    db.collection("components").document(componentID).delete().isComplete
                 }
             }
+
+            while (!deletionProcess.isComplete) {}
         } catch (e: Exception) {
             successful = false
         }
@@ -80,7 +84,7 @@ class DataDeleter {
         var successful = true
 
         try {
-            db.collection("cosplays").document(cosplayID).get().addOnSuccessListener {
+            val deletionProcess = db.collection("cosplays").document(cosplayID).get().addOnSuccessListener {
                 if (it != null && it.data != null) {
                     val components = it.data!!["components"] as ArrayList<*>
 
@@ -99,6 +103,9 @@ class DataDeleter {
                     db.collection("cosplays").document(cosplayID).delete()
                 }
             }
+
+            while (!deletionProcess.isComplete){}
+
         } catch (e: Exception) {
             successful = false
         }

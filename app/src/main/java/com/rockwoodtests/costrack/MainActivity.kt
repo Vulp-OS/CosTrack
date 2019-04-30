@@ -3,6 +3,7 @@ package com.rockwoodtests.costrack
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
@@ -15,16 +16,12 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
 
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.ad_view.*
 import kotlinx.android.synthetic.main.content_main.*
-import kotlinx.android.synthetic.main.content_main.view.*
 import kotlinx.android.synthetic.main.cosplay_view.view.*
-import java.util.HashMap
 
 class MainActivity : AppCompatActivity() {
 
@@ -32,8 +29,6 @@ class MainActivity : AppCompatActivity() {
     private var db = FirebaseFirestore.getInstance()
     private var storage = FirebaseStorage.getInstance()
     private val api = GoogleApiAvailability.getInstance()
-
-    private var adapter: CosplayViewRecyclerViewAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,23 +38,8 @@ class MainActivity : AppCompatActivity() {
         if (api.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
             // Force user to sign in if they are not already signed in to an account
             if (user == null) {
-                val providers = arrayListOf(
-                    AuthUI.IdpConfig.GoogleBuilder().build()
-                )
-
-                startActivityForResult(
-                    AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(providers)
-                        .build(), RC_SIGN_IN
-                )
+                verifyLoggedIn()
             } else {
-//                refreshContainer.setOnRefreshListener {
-//                    adapter?.clear()
-//                    refreshList()
-//
-//                    refreshContainer.isRefreshing = false
-//                }
 
                 loadContent()
             }
@@ -73,6 +53,19 @@ class MainActivity : AppCompatActivity() {
             showAd()
 
         initialLoadCosplays()
+    }
+
+    private fun verifyLoggedIn() {
+        val providers = arrayListOf(
+            AuthUI.IdpConfig.GoogleBuilder().build()
+        )
+
+        startActivityForResult(
+            AuthUI.getInstance()
+                .createSignInIntentBuilder()
+                .setAvailableProviders(providers)
+                .build(), RC_SIGN_IN
+        )
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -104,13 +97,28 @@ class MainActivity : AppCompatActivity() {
 
                 loadContent()
             } else {
-                TODO("Handle failed login")
+                Snackbar.make(fab, "Login failed! Please try again!", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show()
+
+                verifyLoggedIn()
+            }
+        }
+
+        if (requestCode == RC_NEW_COSPLAY) {
+            if (resultCode == Activity.RESULT_OK) {
+                loadContent()
+            }
+        }
+
+        if (requestCode == RC_SHOW_COSPLAY) {
+            if (resultCode == RESULT_COVER_IMAGE_CHANGED || resultCode == RESULT_COSPLAY_DELETED) {
+                loadContent()
             }
         }
     }
 
     fun createNewCosplay(v: View) {
-        startActivity(Intent(this, NewCosplay::class.java))
+        startActivityForResult(Intent(this, NewCosplay::class.java), RC_NEW_COSPLAY)
     }
 
     fun showSelectedCosplay(v: View) {
@@ -118,10 +126,12 @@ class MainActivity : AppCompatActivity() {
 
         val intent = Intent(this, EditCosplay::class.java)
         intent.putExtra("id", cosplayID)
-        startActivity(intent)
+        startActivityForResult(intent, RC_SHOW_COSPLAY)
     }
 
     private fun initialLoadCosplays() {
+        cardContainer.removeAllViews()
+
         Log.d(TAG, "initialLoadCosplays: " + user?.uid)
 
 
@@ -149,42 +159,6 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
-//    private fun initialLoadCosplays() {
-//        db.collection("cosplays").whereEqualTo("owner", user!!.uid).get()
-//            .addOnSuccessListener { query ->
-//                populateCosplayCards(query)
-//            }
-//    }
-//
-//    private fun populateCosplayCards(query: QuerySnapshot) {
-//        //val cosplayData = HashMap<String, HashMap<String, String>>()
-//        val cosplays = ArrayList<HashMap<String, String>>()
-//
-//        for (document in query.documents) {
-//            if (document != null) {
-//                val cosplayData = HashMap<String, String>()
-//                cosplayData["name"] = document.data!!["name"] as String
-//                cosplayData["series"] = document.data!!["series"] as String
-//                cosplayData["coverImageURL"] = document.data!!["cover_image"] as String
-//                cosplayData["tag"] = document.id
-//
-//                cosplays.add(cosplayData)
-//            }
-//        }
-//
-//        Log.d(TAG, cosplays.toString())
-//
-//        adapter = CosplayViewRecyclerViewAdapter(cosplays, this)
-//
-//        Log.d(TAG, adapter?.itemCount.toString())
-//
-//        cardContainer.adapter = adapter
-//    }
-//
-//    private fun refreshList() {
-//
-//    }
-
     private fun showAd() {
         MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713")
 
@@ -192,11 +166,15 @@ class MainActivity : AppCompatActivity() {
 
         cardContainer.addView(inflatedLayout, 0)
 
-        adView.loadAd(AdRequest.Builder().addTestDevice("4C7E70DE46968B35CAA28E6C24111C19").build())
+        adView.loadAd(AdRequest.Builder().addTestDevice("71EE7D7311C00E7F8AFD93814461D52A").build())
     }
 
     companion object {
         private const val RC_SIGN_IN = 123
         private const val TAG = "MainActivity"
+        private const val RC_NEW_COSPLAY = 4
+        private const val RC_SHOW_COSPLAY = 5
+        private const val RESULT_COVER_IMAGE_CHANGED = 996
+        private const val RESULT_COSPLAY_DELETED = 997
     }
 }

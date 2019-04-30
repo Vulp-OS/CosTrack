@@ -71,7 +71,7 @@ class CosplayToolView : Fragment() {
 
     private fun loadCosplayInfo() {
         db.collection("cosplays").document(id!!).get().addOnSuccessListener { cosplayDocument ->
-            if (cosplayDocument != null) {
+            if (cosplayDocument.data != null) {
                 dataCosplayName.text = cosplayDocument.data!!["name"] as String
                 dataNumberComponents.text = (cosplayDocument.data!!["components"] as ArrayList<*>).size.toString()
 
@@ -87,7 +87,7 @@ class CosplayToolView : Fragment() {
                 for (key in componentKeys) {
                     db.collection("components").document(key as String).get()
                         .addOnSuccessListener {
-                            if (it != null) {
+                            if (it.data != null) {
                                 var moneyPlaceholder = (dataMoneySpent.text as String).toLong()
                                 moneyPlaceholder += it.data!!["money_spent"] as Long
                                 dataMoneySpent.text = moneyPlaceholder.toString()

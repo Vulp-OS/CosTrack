@@ -99,15 +99,14 @@ class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionList
         val intent = Intent(this, EditComponent::class.java)
         intent.putExtra("componentID", componentID)
         intent.putExtra("cosplayID", id)
-        startActivity(intent)
-        finish()
+        startActivityForResult(intent, RC_SHOW_COMPONENT)
     }
 
     fun createNewComponent(v: View) {
         val intent = Intent(this, NewComponent::class.java)
         intent.putExtra("id", id)
 
-        startActivityForResult(intent, RESULT_NEW_COMPONENT)
+        startActivityForResult(intent, RC_NEW_COMPONENT)
     }
 
     private fun uploadReferenceImage(uri: Uri) {
@@ -181,16 +180,21 @@ class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionList
 
         Log.d(TAG, "onActivityResult info:\n\tRequestCode: $requestCode\n\tresultCode: $resultCode\n\tdata: $data")
 
-        if (requestCode == RESULT_LOAD_REFERENCE_IMAGE && resultCode == Activity.RESULT_OK && data != null) {
+        if (requestCode == RC_LOAD_REFERENCE_IMAGE && resultCode == Activity.RESULT_OK && data != null) {
             if (data.data != null) {
                 uploadReferenceImage(data.data!!)
             }
-        } else if (requestCode == RESULT_NEW_COMPONENT && resultCode == Activity.RESULT_OK) {
-            pagerManager.adapter!!.notifyDataSetChanged()
-        } else if (requestCode == RESULT_LOAD_COVER_IMAGE && resultCode == Activity.RESULT_OK && data != null) {
+        } else if (requestCode == RC_NEW_COMPONENT && resultCode == Activity.RESULT_OK) {
+            mainCosplayContainer.adapter!!.notifyDataSetChanged()
+        } else if (requestCode == RC_LOAD_COVER_IMAGE && resultCode == Activity.RESULT_OK && data != null) {
             if (data.data != null) {
                 uploadCoverImage(data.data!!)
+                setResult(RESULT_COVER_IMAGE_CHANGED)
             }
+        } else if (requestCode == RC_SHOW_COMPONENT && (resultCode == RESULT_COVER_IMAGE_CHANGED || resultCode == RESULT_COMPONENT_DELETED)) {
+            Log.d(TAG, "Exiting out of Show Component. Notifying DataSetChanged")
+
+            mainCosplayContainer.adapter!!.notifyDataSetChanged()
         }
     }
 
@@ -243,7 +247,7 @@ class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionList
     }
 
     fun deleteCosplay(v: View) {
-        DataDeleter().deleteCosplay(id!!)
+        val result = DataDeleter().deleteCosplay(id!!)
         setResult(RESULT_COSPLAY_DELETED)
         finish()
     }
@@ -313,9 +317,12 @@ class EditCosplay : AppCompatActivity(), ComponentView.OnFragmentInteractionList
 
     companion object {
         private const val TAG = "EditCosplay"
-        private const val RESULT_LOAD_REFERENCE_IMAGE = 1
-        private const val RESULT_NEW_COMPONENT = 2
-        private const val RESULT_LOAD_COVER_IMAGE = 3
+        private const val RC_LOAD_REFERENCE_IMAGE = 1
+        private const val RC_NEW_COMPONENT = 2
+        private const val RC_LOAD_COVER_IMAGE = 3
+        private const val RC_SHOW_COMPONENT = 6
+        private const val RESULT_COVER_IMAGE_CHANGED = 996
         private const val RESULT_COSPLAY_DELETED = 997
+        private const val RESULT_COMPONENT_DELETED = 998
     }
 }

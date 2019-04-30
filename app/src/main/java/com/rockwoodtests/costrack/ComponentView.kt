@@ -94,7 +94,8 @@ class ComponentView : Fragment() {
                         for (key in componentKeys) {
                             db.collection("components").document(key as String).get()
                                 .addOnSuccessListener { componentDocument ->
-                                    if (componentDocument != null) {
+                                    Log.d(TAG, "Loading Component $componentDocument")
+                                    if (componentDocument.data != null) {
                                         val inflatedLayout =
                                             layoutInflater.inflate(R.layout.component_view, cosplayContainer, false)
                                         inflatedLayout.componentCardView.tag = componentDocument.id

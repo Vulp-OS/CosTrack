@@ -57,5 +57,6 @@
     <string name="delete_cosplay">Delete Cosplay</string>
     <string name="change_component_name">Change Component Name</string>
     <string name="delete_reference_image">Delete Reference Image</string>
+    <string name="change_amount_spent">Change Amount Spent</string>
 
 </resources>
